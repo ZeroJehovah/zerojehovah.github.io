@@ -58,8 +58,11 @@
           "resource\\avatar\\180\\1125785\\「寅丸星　エンブレム」.jpg",
           "resource\\avatar\\180\\1125785\\チルノ　エンブレム.jpg"
       ];
-      location.href = imagePath[Math.floor(Math.random() * imagePath.length)];
+//      location.href = imagePath[Math.floor(Math.random() * imagePath.length)];
+        document.write("<meta http-equiv=\"refresh\" content=\"0;url="+imagePath[Math.floor(Math.random() * imagePath.length)]+"\">");
   </script>
+
+
 
   <meta charset="UTF-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
