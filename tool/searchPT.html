@@ -6,20 +6,20 @@
 </head>
 <body>
 	<script type="text/javascript">
-		var ptsites = {
-			mteam: {
-				torrent:'https://pt.m-team.cc/torrents.php?search=',
-				torrent4k:'https://pt.m-team.cc/torrents.php?standard=6&search='
+		var ptsites = [
+			{
+				torrent: 'https://pt.m-team.cc/torrents.php?search=',
+				torrent4k: 'https://pt.m-team.cc/torrents.php?standard=6&search='
 			},
-			ourbits: {
-				torrent:'http://ourbits.club/torrents.php?search=',
-				torrent4k:'http://ourbits.club/torrents.php?standard=5&search='
+			{
+				torrent: 'http://ourbits.club/torrents.php?search=',
+				torrent4k: 'http://ourbits.club/torrents.php?standard=5&search='
 			},
-			springsunday: {
-				torrent:'https://springsunday.net/torrents.php?search=',
-				torrent4k:'https://springsunday.net/torrents.php?standard=1&search='
+			{
+				torrent: 'https://springsunday.net/torrents.php?search=',
+				torrent4k: 'https://springsunday.net/torrents.php?standard=1&search='
 			}
-		};
+		];
 
 		var url = location.href;
 		var paramString = url.substr(url.indexOf("?") + 1).split("&");
@@ -30,12 +30,10 @@
 		var searchType = paramObject.searchType;
 		var keyword = paramObject.keyword;
 
-		for (var o in ptsites) {
-			window.open(ptsites[o][searchType] + keyword);
+		for (var i = 1; i < ptsites.length; i++) {
+			window.open(ptsites[i][searchType] + keyword);
 		}
-		window.opener = null;
-		window.open('', '_self');
-		window.close();
+		location.href = ptsites[0][searchType] + keyword;
 	</script>
 </body>
 </html>
