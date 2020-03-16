@@ -3,6 +3,8 @@
 <head>
 	<meta charset="UTF-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+
+	<title>跳转中...</title>
 </head>
 <body>
 	<script type="text/javascript">
@@ -27,13 +29,13 @@
 		for (i = 0; j = paramString[i]; i ++) {
 			paramObject[j.substring(0, j.indexOf("="))] = j.substr(j.indexOf("=") + 1);
 		}
-		var searchType = paramObject.searchType;
+		var searchType = paramObject.searchType || 'torrent';
 		var keyword = paramObject.keyword;
 
 		for (var i = 1; i < ptsites.length; i++) {
 			window.open(ptsites[i][searchType] + keyword);
 		}
-		location.href = ptsites[0][searchType] + keyword;
+		window.open(ptsites[0][searchType] + keyword, '_self');
 	</script>
 </body>
 </html>
