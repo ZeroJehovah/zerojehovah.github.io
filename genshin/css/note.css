@@ -1,0 +1,56 @@
+div.panel {
+    margin-left: 16px;
+    margin-top: 16px;
+}
+
+#calc {
+    max-width: 672px;
+    min-width: 352px;
+}
+
+.hide {
+    display: none;
+}
+
+p.alert {
+    margin: 0 4px 10px;
+}
+
+#role-break img, #weapon-break img {
+    width: 72px;
+    border-radius: 8px;
+    margin: 4px;
+}
+
+#role-break-config>div, #weapon-break-config>div {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    margin: 4px;
+    position: relative;
+    cursor: pointer;
+}
+
+#role-break-config img, #weapon-break-config img {
+    width: 64px;
+    border-radius: 6px;
+}
+
+#role-break-config>div>div, #weapon-break-config>div>div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border: 6px solid #5bc0de;
+    border-radius: 6px;
+    margin: 0;
+    display: none;
+}
+
+#role-break-config>div.selected>div, #weapon-break-config>div.selected>div {
+    display: block;
+}
+#artifact img {
+    width: 600px;
+}
