@@ -1,6 +1,5 @@
 div.panel {
-    margin-left: 16px;
-    margin-top: 16px;
+    margin: 16px 0 0 16px;
     overflow: hidden;
 }
 
