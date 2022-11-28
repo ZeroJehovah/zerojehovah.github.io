@@ -1,6 +1,7 @@
 div.panel {
     margin-left: 16px;
     margin-top: 16px;
+    overflow: hidden;
 }
 
 #calc {
