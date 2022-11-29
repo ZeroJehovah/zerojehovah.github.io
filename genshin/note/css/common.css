@@ -1,0 +1,69 @@
+body {
+    max-width: 800px;
+    margin: auto;
+}
+
+div.panel {
+    margin: 16px;
+}
+
+p.box {
+    margin: 8px;
+}
+
+#break-list img {
+    width: 72px;
+    border-radius: 8px;
+    margin-right: 8px;
+}
+
+#artifact img {
+    width: 100%;
+}
+
+.achievement table {
+    border-collapse: collapse;
+    border: #E0D6CB 2px solid;
+    margin: 8px;
+    width: calc(100% - 16px);
+    background: #f8f4eb;
+}
+
+.achievement-icon {
+    width: 92px;
+}
+
+.achievement-icon img {
+    width: 100%;
+}
+
+strong.achievement-title {
+    font-size: 16px;
+}
+
+.achievement-description {
+    color: #baa48e;
+}
+
+strong.achievement-title, .achievement-description {
+    display: block;
+    margin: 4px;
+}
+
+strong.achievement-title.achievement-long-margin {
+    margin-top: 10px;
+}
+
+.achievement-description.achievement-long-margin {
+    margin-top: 6px;
+}
+
+.achievement-action {
+    margin: 4px 16px 4px 4px;
+    color: #888;
+    font-size: 12px;
+}
+
+.achievement-action.text-success {
+    color: #9fe383;
+}
