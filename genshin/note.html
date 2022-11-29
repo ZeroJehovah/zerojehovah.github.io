@@ -10,42 +10,35 @@
     <link rel="bookmark" href="/resource/icon/favicon.ico"/>
 
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/note.css" rel="stylesheet">
+    <link href="note/css/common.css" rel="stylesheet">
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="js/note-config.js"></script>
-    <script src="js/calc.js"></script>
-    <script src="js/artifact.js"></script>
+    <script src="note/js/config.js"></script>
+    <script src="note/js/common.js"></script>
+    <script src="note/js/calc.js"></script>
+    <script src="note/js/event.js"></script>
+    <script src="note/js/artifact.js"></script>
+    <script src="note/js/achievement.js"></script>
 </head>
 <body>
-<div class="panel panel-default pull-left" id="calc">
+<div class="panel panel-default hidden" id="calc">
     <div class="panel-heading">
+        <a class='btn btn-default btn-xs pull-right' href='https://github.dev/ZeroJehovah/zerojehovah.github.io' target='_blank'><span class='glyphicon glyphicon-edit'></span></a>
         <span id="date"></span>
-        <button class="btn btn-default btn-xs pull-right" style="margin-left: 8px;" onclick="$('#calc-config').modal('show');"><span class="glyphicon glyphicon-cog"></span></button>
-        <button class="btn btn-default btn-xs pull-right" onclick="findAllData();"><span class="glyphicon glyphicon-refresh"></span></button>
     </div>
-    <div class="panel-body">
-        <p class="alert alert-success hide" role="alert" id="birthday-notice"></p>
-        <p class="alert alert-success hide" role="alert" id="empty-notice">今天没有需要的突破材料</p>
-        <p class="hide" id="role-break"></p>
-        <p class="hide" id="weapon-break"></p>
-    </div>
+    <p class="alert alert-success box hidden" role="alert" id="empty-notice">今天没有需要的突破材料</p>
+    <p class="box hidden" id="break-list"></p>
 </div>
-<div class="panel panel-default pull-left" id="artifact">
+<div class="panel panel-default hidden" id="event">
+    <div class="panel-heading">
+        <span>近期活动</span>
+    </div>
+    <ul class="list-group" id="event-list"></ul>
+</div>
+<div class="panel panel-default hidden" id="artifact">
     <div class="panel-heading">
         <span id="road"></span>
     </div>
 </div>
-<div class="modal fade" id="calc-config">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p id="role-break-config"></p>
-                <p id="weapon-break-config"></p>
-            </div>
-        </div>
-    </div>
-</div>
-
 </body>
 </html>
