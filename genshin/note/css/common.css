@@ -5,6 +5,7 @@ body {
 
 div.panel {
     margin: 16px;
+    overflow: hidden;
 }
 
 p.box {
