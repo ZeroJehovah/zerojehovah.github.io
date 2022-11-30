@@ -37,7 +37,7 @@ const ACHIEVEMENT = [{
             finish: false
         }, {
             title: "邪眼",
-            finish: false
+            finish: true
         }, {
             title: "女皇陛下",
             finish: true
