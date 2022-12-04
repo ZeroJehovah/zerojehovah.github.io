@@ -14,7 +14,7 @@ const ACHIEVEMENT = [{
             finish: true
         }, {
             title: "莎拉",
-            finish: false
+            finish: true
         }, {
             title: "薇尔",
             finish: false
