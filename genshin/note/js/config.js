@@ -27,9 +27,6 @@ const ACHIEVEMENT = [{
             finish: false
         }]
     },{
-        title: "略表歉意",
-        description: "在委托任务「鸽子、鸭子、小孩子」中，杀死鸭子"
-    },{
         title: "有一说一",
         description: "在委托任务「来自冬天的故事」中探听到所有关于至冬国的情报",
         actions: [{
