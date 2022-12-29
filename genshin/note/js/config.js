@@ -1,5 +1,5 @@
-const FOLLOW_ROLE = ["刻晴", "莱依拉", "纳西妲"];
-const FOLLOW_WEAPON = ["试作金珀"];
+const FOLLOW_ROLE = ["莱依拉", "纳西妲"];
+const FOLLOW_WEAPON = ["试作金珀", "西风猎弓"];
 const ACHIEVEMENT = [{
     title: "蒙德委托成就",
     url: "https://bbs.mihoyo.com/ys/article/27622995",
