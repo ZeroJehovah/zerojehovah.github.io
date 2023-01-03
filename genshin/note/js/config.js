@@ -23,7 +23,7 @@ const ACHIEVEMENT = [{
         title: "过量的思念",
         description: "完成5次委托任务「愿风带走思念」",
         actions: [{
-            title: "2/5",
+            title: "3/5",
             finish: false
         }]
     },{
