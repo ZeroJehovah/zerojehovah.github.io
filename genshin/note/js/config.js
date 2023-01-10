@@ -1,4 +1,4 @@
-const FOLLOW_ROLE = ["莱依拉", "纳西妲"];
+const FOLLOW_ROLE = ["莱依拉"];
 const FOLLOW_WEAPON = ["试作金珀", "西风猎弓"];
 const ACHIEVEMENT = [{
     title: "蒙德委托成就",
@@ -41,5 +41,6 @@ const ACHIEVEMENT = [{
         }]
     }]
 }];
+const MUSIC_NOT_GET = [2, 5, 6, 9, 12, 17, 18, 20, 21, 22, 25, 29, 30, 31, 35, 36, 37, 41, 42, 43, 44, 46, 51, 55, 58, 60, 61, 62, 63, 64, 65, 66, 67, 68, 70, 71];
 
 // up to 20230104
