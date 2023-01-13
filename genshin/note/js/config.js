@@ -1,4 +1,4 @@
-const FOLLOW_ROLE = ["莱依拉"];
+const FOLLOW_ROLE = ["夜兰", "云堇"];
 const FOLLOW_WEAPON = ["试作金珀", "西风猎弓"];
 const ACHIEVEMENT = [{
     title: "蒙德委托成就",
