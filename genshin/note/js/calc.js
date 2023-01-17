@@ -2,6 +2,9 @@ const calc_week_array = ["", "一", "二", "三", "四", "五", "六", "日"];
 const calc_role = [];
 const calc_weapon = [];
 const calc_week = date.getDay() === 0 ? "7" : String(date.getDay());
+let CALC_DATA;
+let ALL_ROLES = [];
+let ALL_WEAPONS = [];
 
 $(function () {
     calc_init_title();
@@ -20,33 +23,51 @@ function calc_query_data() {
     $.get("https://api-static.mihoyo.com/common/blackboard/ys_obc/v1/get_activity_calendar?app_sn=ys_obc", {
         random: date.getDate()
     }, function (data) {
-        init_data(data);
+        CALC_DATA = data;
+        if (FOLLOW_ROLE && FOLLOW_WEAPON) {
+            init_data();
+        }
     });
 }
 
-function init_data(data) {
-    let list = data.data.list;
+function init_data() {
+    let list = CALC_DATA.data.list;
     for (let i = 0; i < list.length; i++) {
         if (list[i].kind !== "2") {
             continue;
         }
-        if (list[i].drop_day.indexOf(calc_week) === -1) {
-            continue;
-        }
-        if (list[i].break_type === "2" && FOLLOW_ROLE.indexOf(list[i].title) > -1) {
-            calc_role.push(list[i]);
-        } else if (list[i].break_type === "1" && FOLLOW_WEAPON.indexOf(list[i].title) > -1) {
-            calc_weapon.push(list[i]);
+        if (list[i].break_type === "2") {
+            ALL_ROLES.push({
+                title: list[i].title,
+                img_url: list[i].img_url,
+                sort: list[i].sort
+            });
+            if (list[i].drop_day.indexOf(calc_week) > -1 && FOLLOW_ROLE.indexOf(list[i].title) > -1) {
+                calc_role.push(list[i]);
+            }
+        } else if (list[i].break_type === "1") {
+            ALL_WEAPONS.push({
+                title: list[i].title,
+                img_url: list[i].img_url,
+                sort: list[i].sort
+            });
+            if (list[i].drop_day.indexOf(calc_week) > -1 && FOLLOW_WEAPON.indexOf(list[i].title) > -1) {
+                calc_weapon.push(list[i]);
+            }
         }
     }
     calc_role.sort(calc_compare);
     calc_weapon.sort(calc_compare);
-    console.log("calc: 已从米游社获取数据")
+    show_data();
+    ALL_ROLES.sort(calc_compare);
+    ALL_WEAPONS.sort(calc_compare);
+    console.log("calc: 已从米游社获取数据");
     console.groupCollapsed("calc-data");
     console.log(calc_role);
     console.log(calc_weapon);
+    console.log(ALL_ROLES);
+    console.log(ALL_WEAPONS);
     console.groupEnd();
-    show_data();
 }
 
 function show_data() {
@@ -72,9 +93,13 @@ function show_data() {
 }
 
 function calc_compare(a, b) {
-    if (a.sort && b.sort) {
+    if (a.sort && isNaN(a.sort)) {
         a.sort = JSON.parse(a.sort)["0"];
+    }
+    if (b.sort && isNaN(b.sort)) {
         b.sort = JSON.parse(b.sort)["0"];
+    }
+    if (a.sort && b.sort) {
         return a.sort - b.sort;
     }
     return 0;

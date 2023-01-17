@@ -21,9 +21,24 @@
     <script src="note/js/achievement.js"></script>
 </head>
 <body>
+<div class="panel panel-default hidden" id="set-token">
+    <div class="panel-heading">
+        <span>设置Token</span>
+    </div>
+    <div class="panel-body">
+        <pre id="set-token-message"></pre>
+        <div class="input-group">
+            <label class="sr-only" for="token-value">token value</label>
+            <input type="text" class="form-control" placeholder="write token here" id="token-value">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" onclick="set_token()"><span class="glyphicon glyphicon-arrow-right"></span></button>
+            </span>
+        </div>
+    </div>
+</div>
 <div class="panel panel-default hidden" id="calc">
     <div class="panel-heading">
-        <a class='btn btn-default btn-xs pull-right' href='https://github.dev/ZeroJehovah/zerojehovah.github.io' target='_blank'><span class='glyphicon glyphicon-edit'></span></a>
+        <button class='btn btn-default btn-xs pull-right' onclick="show_edit_config_page()"><span class='glyphicon glyphicon-edit'></span></button>
         <span id="date"></span>
     </div>
     <p class="alert alert-success box hidden" role="alert" id="empty-notice">今天没有需要的突破材料</p>
@@ -38,6 +53,32 @@
 <div class="panel panel-default hidden" id="artifact">
     <div class="panel-heading">
         <span id="road"></span>
+    </div>
+</div>
+<div id="edit-config-page" class="hidden">
+    <div class="container">
+        <div class="panel-body">
+            <div class="form-inline">
+                <button class="btn btn-default" onclick="config_back();">返回</button>
+                <button class="btn btn-default" onclick="show_edit_json();">编辑Json</button>
+                <button class="btn btn-primary" onclick="config_save_page();">保存页面</button>
+                <div class="input-group pull-right hidden" id="config-edit-json">
+                    <input id="config-json" class="form-control">
+                    <label class="sr-only" for="config-json">config json</label>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" onclick="config_save_json();">保存Json</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div>
+        </div>
+        <div class="panel-body">
+            <h3><span class="title slide-btn">角色</span></h3>
+            <div id="config-break-role"></div>
+            <h3><span class="title slide-btn">武器</span></h3>
+            <div id="config-break-weapon"></div>
+            <h3><span class="title slide-btn">成就</span></h3>
+            <div id="config-achievement"></div>
+        </div>
     </div>
 </div>
 </body>
