@@ -1,17 +1,17 @@
-$(function() {
+function show_achievement() {
     for (let i = 0; i < ACHIEVEMENT.length; i++) {
         let achievement_title = ACHIEVEMENT[i].title;
         let achievement_url = ACHIEVEMENT[i].url;
         let achievements = ACHIEVEMENT[i].achievements;
         achievement_create_panel(achievement_title, achievement_url, achievements);
     }
-});
+}
 
 function achievement_create_panel(achievement_title, achievement_url, achievements) {
     if (!achievement_title || !achievements || !achievements.length) {
         return;
     }
-    let panel = $("<div class=\"panel panel-default achievement hidden\"><div class=\"panel-heading\"><a class='btn btn-default btn-xs pull-right' href='https://github.dev/ZeroJehovah/zerojehovah.github.io' target='_blank'><span class='glyphicon glyphicon-edit'></span></a><span></span></div></div>");
+    let panel = $("<div class=\"panel panel-default achievement hidden\"><div class=\"panel-heading\"><button class='btn btn-default btn-xs pull-right' onclick=\"show_edit_config_page()\"><span class='glyphicon glyphicon-edit'></span></button><span></span></div></div>");
     if (achievement_url) {
         panel.find(".panel-heading>span").append($("<a href='" + achievement_url + "' target='_blank'>" + achievement_title + "</a>"));
     } else {
@@ -23,14 +23,23 @@ function achievement_create_panel(achievement_title, achievement_url, achievemen
         let achievement_title_td = achievement_table.find("td.achievement-title");
         achievement_title_td.append($("<strong class='achievement-title'>" + achievements[i].title + "</strong>"));
         achievement_title_td.append($("<strong class='achievement-description'>" + achievements[i].description + "</strong>"));
-        if (achievements[i].actions && achievements[i].actions.length) {
+        if (achievements[i].type === "action") {
             for (let j = 0; j < achievements[i].actions.length; j++) {
-                let action_span = $("<strong class='achievement-action'>" +achievements[i].actions[j].title + "</strong>");
+                let action_span = $("<strong class='achievement-action'>" + achievements[i].actions[j].title + "</strong>");
                 if (achievements[i].actions[j].finish) {
-                    action_span.append($("<span class='glyphicon glyphicon-ok'></span>")).addClass("text-success");
+                    action_span.prepend($("<span class='glyphicon glyphicon-ok'></span>")).addClass("text-success");
                 }
                 achievement_title_td.append(action_span);
             }
+        } else if (achievements[i].type === "count") {
+            for (let j = 0; j < achievements[i].counts.length; j++) {
+                let action_span = $("<strong class='achievement-action'>" + achievements[i].counts[j].title + ":&nbsp" + achievements[i].counts[j].finish + "/" + achievements[i].counts[j].total + "</strong>");
+                if (achievements[i].counts[j].finish === achievements[i].counts[j].total) {
+                    action_span.prepend($("<span class='glyphicon glyphicon-ok'></span>")).addClass("text-success");
+                }
+                achievement_title_td.append(action_span);
+            }
+
         } else {
             achievement_title_td.find("strong").addClass("achievement-long-margin");
         }

@@ -12,6 +12,7 @@ function event_query_data () {
 
 function event_show_data(data) {
    let list = data.data.list[0].children[0].children[0].list;
+   console.log("event: 已从米游社获取数据");
    console.groupCollapsed("event-data");
    console.log(list);
    console.groupEnd();

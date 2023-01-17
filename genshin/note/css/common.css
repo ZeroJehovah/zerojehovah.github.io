@@ -63,8 +63,82 @@ strong.achievement-title.achievement-long-margin {
     margin: 4px 16px 4px 4px;
     color: #888;
     font-size: 12px;
+    display: inline-block;
 }
 
 .achievement-action.text-success {
     color: #9fe383;
+}
+
+.hidden-by-config {
+    display: none;
+}
+
+#edit-config-page {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1024;
+    background-color: #fff;
+}
+
+#config-achievement .btn {
+    outline: none !important;
+}
+
+span.config-break-item, span.config-achievement-action, span.config-achievement-count {
+    display: inline-block;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 4px 10px;
+    margin: 0 4px 4px 0;
+}
+
+span.config-break-item, span.config-achievement-action {
+    cursor: pointer;
+}
+
+span.config-achievement-count {
+    font-weight: bold;
+}
+
+span.config-break-item span.icon-ok, span.config-achievement-action span.icon-ok, span.config-achievement-count span.icon-ok {
+    display: none;
+}
+
+span.config-break-item.selected, span.config-achievement-action.finished, span.config-achievement-count.finished {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    font-weight: bold;
+}
+
+span.config-break-item.selected span.icon-ok, span.config-achievement-action.finished span.icon-ok, span.config-achievement-count.finished span.icon-ok {
+    display: inline;
+}
+
+#config-achievement, .config-achievement-group {
+    overflow: hidden;
+}
+
+.config-achievement-group {
+    margin-bottom: 20px;
+    margin-left: 20px;
+}
+
+#config-achievement small {
+    margin-left: 8px;
+}
+
+.slide-btn, span.config-achievement-count span.count-btns {
+    color: #337ab7;
+    cursor: pointer;
+}
+
+.config-achievement-title .title {
+    color: #d7a11a;
+    font-weight: bold;
 }
