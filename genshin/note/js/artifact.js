@@ -1,11 +1,11 @@
-const artifact_version = '20221129';
+const artifact_version = 'v3.4';
 const artifact_image_path = [
     {
-        title: "雪山(2)-璃月(7)-雨林(7)-沙漠(3)",
-        path: "/resource/img/road-a.jpg"
+        title: "稻妻(2)-璃月(6)-雨林(6)-沙漠(3)",
+        path: "/resource/img/road-v3.4-a.jpg"
     }, {
-        title: "沙漠(1)-雨林(5)-璃月(2)-稻妻(12)",
-        path: "/resource/img/road-b.jpg"
+        title: "沙漠(4)-雨林(5)-璃月(2)-雪山(2)-稻妻(9)",
+        path: "/resource/img/road-v3.4-b.jpg"
     }
 ];
 
