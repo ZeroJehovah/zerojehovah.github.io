@@ -20,7 +20,7 @@ function artifact_show_image() {
         image.css("display", "none");
     }
     panel.append(image);
-    panel.find("div.panel-heading").click(function() {
+    panel.find("div.panel-heading").click(function () {
         if (localStorage.getItem("artifact-image-hide")) {
             localStorage.removeItem("artifact-image-hide");
             $("#artifact").find("a.image").slideDown("fast");

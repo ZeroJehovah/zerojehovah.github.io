@@ -1,8 +1,8 @@
-$(function() {
+$(function () {
    event_query_data();
 });
 
-function event_query_data () {
+function event_query_data() {
    $.get("https://api-static.mihoyo.com/common/blackboard/ys_obc/v1/home/position?app_sn=ys_obc", {
       random: date.getDate()
    }, function (data) {
