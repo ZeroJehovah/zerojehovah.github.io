@@ -218,4 +218,6 @@ body, div.modal {
     padding: 6px 12px;
     transform: translate(0, 1px);
     margin: 0;
+    width: 78px;
+    text-align: left;
 }

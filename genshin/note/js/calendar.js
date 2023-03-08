@@ -42,6 +42,7 @@ function calc_tool_action() {
         sum += inputs.eq(i).val() * (3 ** i);
     }
     sum = sum / (3 ** calc_item_rank);
+    sum = sum.toFixed(2);
     let target = parseInt($("#calc-tool-target").val());
     let result_div = $("#calc-tool-result");
     result_div.removeClass("alert-info alert-success alert-warning");
