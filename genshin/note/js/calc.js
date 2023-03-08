@@ -104,3 +104,7 @@ function calc_compare(a, b) {
     }
     return 0;
 }
+
+function show_calc_tool_modal() {
+    
+}
