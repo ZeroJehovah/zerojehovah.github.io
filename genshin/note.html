@@ -16,7 +16,7 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="note/js/config.js"></script>
     <script src="note/js/common.js"></script>
-    <script src="note/js/calc.js"></script>
+    <script src="note/js/calendar.js"></script>
     <script src="note/js/event.js"></script>
     <script src="note/js/artifact.js"></script>
     <script src="note/js/achievement.js"></script>
@@ -39,11 +39,11 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default hidden" id="calc">
+    <div class="panel panel-default hidden" id="calendar">
         <div class="panel-heading">
             <button class='btn btn-default btn-xs pull-right' onclick="show_edit_config_page()"><span
                     class='glyphicon glyphicon-edit'></span></button>
-            <button class='btn btn-default btn-xs pull-right' onclick="show_calc_tool_modal()"><span
+            <button class='btn btn-default btn-xs pull-right' onclick="show_calc_tool_modal()" style="margin-right: 6px;"><span
                     class='glyphicon glyphicon-flash'></span></button>
             <span id="date"></span>
         </div>
@@ -92,9 +92,46 @@
     <div class="modal fade" tabindex="-1" role="dialog" id="calc-tool">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-body">
-                    
-                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="calc-item-star calc-item-star-1">★</th>
+                            <th class="calc-item-star calc-item-star-2">★★</th>
+                            <th class="calc-item-star calc-item-star-3">★★★</th>
+                            <th class="calc-item-star calc-item-star-4">★★★★</th>
+                            <th class="calc-item-star calc-item-star-5">★★★★★</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="number"></td>
+                            <td><input type="number"></td>
+                            <td><input type="number"></td>
+                            <td><input type="number"></td>
+                            <td><input type="number"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <form class="form-inline">
+                                    <strong>需求：</strong>
+                                    <select class="form-control calc-item-star calc-item-star-5"
+                                        id="calc-tool-rank-select">
+                                        <option class="calc-item-star calc-item-star-1" value="0">★</option>
+                                        <option class="calc-item-star calc-item-star-2" value="1">★★</option>
+                                        <option class="calc-item-star calc-item-star-3" value="2">★★★</option>
+                                        <option class="calc-item-star calc-item-star-4" value="3">★★★★</option>
+                                        <option class="calc-item-star calc-item-star-5" value="4">★★★★★</option>
+                                    </select>
+                                    <strong>×</strong>
+                                    <input type="number" class="form-control" id="calc-tool-target">
+                                    <strong>，已有：</strong>
+                                    <!-- <input type="number" class="form-control" id="calc-tool-result" disabled="disabled"> -->
+                                    <div class="alert alert-success" id="calc-tool-result">255</div>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->

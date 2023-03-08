@@ -1,10 +1,10 @@
-const artifact_version = 'v3.4';
+const artifact_version = 'v3.4-2';
 const artifact_image_path = [
     {
-        title: "稻妻(2)-璃月(6)-雨林(6)-沙漠(3)",
+        title: "A线：稻妻(2)-璃月(6)-雨林(6)-沙漠(3)",
         path: "/resource/img/road-v3.4-a.jpg"
     }, {
-        title: "沙漠(4)-雨林(5)-璃月(2)-雪山(2)-稻妻(9)",
+        title: "B线：沙漠(4)-雨林(5)-璃月(2)-雪山(2)-稻妻(9)",
         path: "/resource/img/road-v3.4-b.jpg"
     }
 ];
@@ -13,9 +13,22 @@ function artifact_show_image() {
     let index = Math.floor((new Date() - new Date('2022-01-01')) / 24 / 60 / 60 / 1000) % artifact_image_path.length;
     let image_path = artifact_image_path[index].path;
     let storage_images = JSON.parse(localStorage.getItem("artifact-images"));
-    $("#road").text("今日圣遗物路线：" + artifact_image_path[index].title);
+    $("#road").text("今日圣遗物路线为" + artifact_image_path[index].title);
     let panel = $("#artifact");
-    panel.append($("<a href='" + image_path + "' target='_blank'><img alt='" + artifact_image_path[index].title + "' src='" + storage_images[image_path] + "'></a>"));
+    let image = $("<a href='" + image_path + "' target='_blank' class='image'><img alt='" + artifact_image_path[index].title + "' src='" + storage_images[image_path] + "'></a>");
+    if (localStorage.getItem("artifact-image-hide")) {
+        image.css("display", "none");
+    }
+    panel.append(image);
+    panel.find("div.panel-heading").click(function() {
+        if (localStorage.getItem("artifact-image-hide")) {
+            localStorage.removeItem("artifact-image-hide");
+            $("#artifact").find("a.image").slideDown("fast");
+        } else {
+            localStorage.setItem("artifact-image-hide", "true");
+            $("#artifact").find("a.image").slideUp("fast");
+        }
+    });
     panel.removeClass("hidden");
 }
 
