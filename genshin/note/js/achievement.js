@@ -1,5 +1,9 @@
 function show_achievement() {
     for (let i = 0; i < ACHIEVEMENT.length; i++) {
+        let achievement_visible = ACHIEVEMENT[i].visible;
+        if (!achievement_visible) {
+            continue;
+        }
         let achievement_title = ACHIEVEMENT[i].title;
         let achievement_url = ACHIEVEMENT[i].url;
         let achievements = ACHIEVEMENT[i].achievements;

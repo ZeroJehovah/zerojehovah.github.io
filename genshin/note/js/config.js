@@ -31,7 +31,7 @@ function get_config() {
             FOLLOW_ROLE = config_json.FOLLOW_ROLE;
             FOLLOW_WEAPON = config_json.FOLLOW_WEAPON;
             ACHIEVEMENT = config_json.ACHIEVEMENT;
-            if (CALC_DATA) {
+            if (CALENDAR_DATA) {
                 init_data();
             }
             show_achievement();
@@ -99,6 +99,11 @@ function show_edit_config_page() {
     for (let i = 0; i < ACHIEVEMENT.length; i++) {
         let header = $("<h4></h4>");
         header.append($("<span class='title slide-btn'></span>").text(ACHIEVEMENT[i].title));
+        if (ACHIEVEMENT[i].visible) {
+            header.append($("<small><a href='javascript: void(0);' onclick=\"$(this).children().toggleClass('glyphicon-eye-open glyphicon-eye-close')\" class='visible'><span class='glyphicon glyphicon-eye-open'></span></a></small>"));
+        } else {
+            header.append($("<small><a href='javascript: void(0);' onclick=\"$(this).children().toggleClass('glyphicon-eye-open glyphicon-eye-close')\" class='visible'><span class='glyphicon glyphicon-eye-close'></span></a></small>"));
+        }
         if (ACHIEVEMENT[i].url) {
             header.append($("<small><a href='" + ACHIEVEMENT[i].url + "' target='_blank' class='url'><span class='glyphicon glyphicon-new-window'></span></a></small>"));
         }
@@ -195,6 +200,7 @@ function config_save_page() {
         let achievement_json = {};
         achievement_json.title = achievement_group.eq(i).find("span.title").text();
         achievement_json.url = achievement_group.eq(i).find("a.url").attr("href");
+        achievement_json.visible = achievement_group.eq(i).find("a.visible").children().hasClass("glyphicon-eye-open");
         achievement_json.achievements = [];
         let achievements = achievement_group.eq(i + 1).children();
         for (let j = 0; j < achievements.length; j += 2) {

@@ -18,6 +18,10 @@ p.box {
     margin-right: 8px;
 }
 
+#artifact div.panel-heading {
+    cursor: pointer;
+}
+
 #artifact img {
     width: 100%;
 }
@@ -141,4 +145,77 @@ span.config-break-item.selected span.icon-ok, span.config-achievement-action.fin
 .config-achievement-title .title {
     color: #d7a11a;
     font-weight: bold;
+}
+
+body, div.modal {
+    padding-right: 0 !important;
+}
+
+#calc-tool .modal-content {
+    overflow: hidden;
+}
+
+#calc-tool table {
+    table-layout: fixed;
+    margin: 0;
+}
+
+#calc-tool th, #calc-tool td {
+    text-align: center;
+}
+
+#calc-tool th {
+    font-size: 20px;
+    border-bottom: none;
+}
+
+#calc-tool .calc-item-star {
+    color: #ffcc32;
+    text-shadow: 1px 1px grey;
+}
+
+#calc-tool .calc-item-star-1 {
+    background-color: #7f7d7d;
+}
+
+#calc-tool .calc-item-star-2 {
+    background-color: #558e72;
+}
+
+#calc-tool .calc-item-star-3 {
+    background-color: #5889a5;
+}
+
+#calc-tool .calc-item-star-4 {
+    background-color: #a277b4;
+}
+
+#calc-tool .calc-item-star-5 {
+    background-color: #c77d30;
+}
+
+#calc-tool tbody tr:first-child td {
+    padding: 0;
+}
+
+#calc-tool tbody tr:first-child td input {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: center;
+    height: 36px;
+    line-height: 32px;
+    font-size: 32px;
+    padding-left: 18px;
+}
+
+#calc-tool tbody tr:last-child td input {
+    width: 100px;
+}
+
+#calc-tool-result {
+    display: inline-block;
+    padding: 6px 12px;
+    transform: translate(0, 1px);
+    margin: 0;
 }
