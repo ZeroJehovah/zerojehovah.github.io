@@ -22,7 +22,7 @@ function calendar_init_title() {
 }
 
 function calendar_init_event() {
-    $("#calc-tool tbody tr:first-child td input, #calc-tool-target").change(function() {
+    $("#calc-tool tbody tr:first-child td input, #calc-tool-target").change(function () {
         if (parseInt($(this).val()) < 0) {
             $(this).val(0);
         }
