@@ -100,7 +100,7 @@
 					var monthMoneyB = totalMoney - monthMoneyA * (i - 1);
 					p.find("span.month-money").text(monthMoneyA + "*" + (i - 1) + "+" + monthMoneyB + "*1");
 				}
-				var peopleNumner = Math.ceil(totalMoney / i / 4800) + 0;
+				var peopleNumner = Math.ceil(totalMoney / i / (maxMoneyGroup - 1));
 				p.find("span.people-number").text(peopleNumner);
 				if (peopleNumner > 1000) {
 					p.find("button").hide();
@@ -139,151 +139,121 @@
 
 		}
 
+		/**
+		 * 工资档位：245、180
+		 */
+		var maxMoneyPerMonth = 5000;
+		var moneyPerDay = [245, 180];
+		var moneyGroupDetails = [];
+		var moneyGroupNum;
+		var moneyGroups = [];
+		var maxMoneyGroup = 0;
+		var moneyUpRoads = [];
+
+		$(function() {
+			for (var i = 0; i < moneyPerDay.length; i++) {
+				var day = Math.floor((maxMoneyPerMonth - 1) / moneyPerDay[i]) + 1;
+				while (day * moneyPerDay[i] > (maxMoneyPerMonth / 2)) {
+					moneyGroupDetails.push([moneyPerDay[i], --day]);
+				}
+			}
+			moneyGroupNum = moneyGroupDetails.length;
+			for (var i = 0; i < moneyGroupNum; i++) {
+				var moneyGroup = moneyGroupDetails[i][0] * moneyGroupDetails[i][1];
+				moneyGroups.push(moneyGroup);
+				maxMoneyGroup = Math.max(maxMoneyGroup, moneyGroup);
+			}
+			for (var i = 0; i < moneyGroupNum; i++) {
+				for (var j = 0; j < moneyGroupNum; j++) {
+					if (moneyGroups[i] < moneyGroups[j]) {
+						moneyUpRoads.push([i, j]);
+					}
+				}
+			}
+			console.log("moneyGroupDetails:", moneyGroupDetails);
+			console.log("moneyGroupNum:", moneyGroupNum);
+			console.log("moneyGroups:", moneyGroups);
+			console.log("maxMoneyGroup:", maxMoneyGroup);
+			console.log("moneyUpRoads:", moneyUpRoads);
+		});
+
+		function moveMoneyGroupPeople(moneyGroupPeopleNumber, isMoveUp) {
+			var tempRoads = [];
+			for (var i = 0; i < moneyUpRoads.length; i++) {
+				if (moneyGroupPeopleNumber[moneyUpRoads[i][(isMoveUp + 1) % 2]]) {
+					tempRoads.push(moneyUpRoads[i]);
+				}
+			}
+			if (!tempRoads.length) {
+				return false;
+			}
+			var randomNum = Math.floor(Math.random() * tempRoads.length);
+			var road = tempRoads[randomNum];
+			moneyGroupPeopleNumber[road[(isMoveUp + 1) % 2]] -= 1;
+			moneyGroupPeopleNumber[road[isMoveUp % 2]] += 1;
+			return true;
+		}
+
 		function calculatorMonthMoney(monthMoney, monthNumber, peopleNumber) {
-			console.log(monthMoney);
-			console.log(monthNumber);
-			console.log(peopleNumber);
+			console.log("monthMoney:", monthMoney);
+			console.log("monthNumber:", monthNumber);
+			console.log("peopleNumber:", peopleNumber);
 
 			var panel = $("div#panel-hide>div").clone();
 			panel.hide().find("div.panel-heading").text(monthMoney + "*" + monthNumber);
 
 			var details = [];
+			var moneyGroupPeopleNumber = [];
 
-			/**
-			* 基本单位：10元，半天
-			* 工资上限1：200元，24天：960单位，10*0.5天
-			* 工资上限2：180元，27天：972单位，9*0.5天
-			* 工资上限3：160元，30天：960单位，8*0.5天
-			*/
-			var halfDayNumber = Math.ceil(monthMoney / 10);
-			var moneyA = Math.round(halfDayNumber * 0.5 / 10) * 10;
-			var moneyB = halfDayNumber - moneyA;
-			while (moneyB % 9 != 0) {
-				moneyA -= 10;
-				moneyB += 10;
+			var quarterPeopleNumber = Math.floor(peopleNumber / moneyGroupNum);
+			for (var i = 0; i < moneyGroupNum - 1; i++) {
+				moneyGroupPeopleNumber.push(quarterPeopleNumber);
 			}
-			if (moneyA < 10) {
-				$("<p>").appendTo("div#panel-show").text("计算错误，请选择其它方案，如单月金额过小请手动计算。").css("padding-left", "15px").css("font-weight", "bold").addClass("text-danger").hide().fadeIn("fast");
-				return false;
-			}
-			moneyA = moneyA / 10;
-			moneyB = moneyB / 9;
+			moneyGroupPeopleNumber.push(peopleNumber - quarterPeopleNumber * (moneyGroupNum - 1));
 
-			var peopleA = Math.round(peopleNumber * moneyA * 10 / halfDayNumber);
-			var peopleB = peopleNumber - peopleA;
-			var moneyAx = Math.ceil(moneyA / 2);
-			var moneyBx = Math.ceil(moneyB / 2);
-			var dayA = Math.floor(moneyAx / peopleA);
-			var dayAx = moneyAx % peopleA;
-			var dayB = Math.floor(moneyBx / peopleB);
-			var dayBx = moneyBx % peopleB;
-			for (var i = 0; i < peopleA; i++) {
-				var peopleInfo = {};
-				peopleInfo.money = 200;
-				peopleInfo.day = dayA + (i < dayAx);
-				if (moneyA % 2 == 1 && i == 0) peopleInfo.day -= 0.5;
-				peopleInfo.totalMoney = 200 * peopleInfo.day;
-				details.push(peopleInfo);
+			// 计算值 - 输入值
+			var difference = 0 - monthMoney;
+			for (var i = 0; i < moneyGroupNum; i++) {
+				difference += moneyGroups[i] * moneyGroupPeopleNumber[i];
 			}
-			for (var i = 0; i < peopleB; i++) {
-				var peopleInfo = {};
-				peopleInfo.money = 180;
-				peopleInfo.day = dayB + (i < dayBx);
-				if (moneyB % 2 == 1 && i == 0) peopleInfo.day -= 0.5;
-				peopleInfo.totalMoney = 180 * peopleInfo.day;
-				details.push(peopleInfo);
-			}
-
-			while ((peopleA > 0 && details[0].totalMoney > 4999) || (peopleA > 1 && details[1].totalMoney > 4999)) {
-				console.log("发现错误，原因：A组存在月薪大于等于5000的情况，重新计算");
-				console.log(details);
-				details = [];
-				moneyA -= 9;
-				moneyB += 10;
-				if (moneyA < 1) {
+			console.log("moneyGroupPeopleNumber:", moneyGroupPeopleNumber);
+			console.log("difference:", difference);
+			while (difference > 90 || difference < 0) {
+				var result = moveMoneyGroupPeople(moneyGroupPeopleNumber, difference < 0);
+				console.log("moneyGroupPeopleNumber:", moneyGroupPeopleNumber);
+				if (!result) {
 					$("<p>").appendTo("div#panel-show").text("计算错误，请选择其它方案，如单月金额过小请手动计算。").css("padding-left", "15px").css("font-weight", "bold").addClass("text-danger").hide().fadeIn("fast");
 					return false;
 				}
-				var peopleA = Math.round(peopleNumber * moneyA * 10 / halfDayNumber);
-				var peopleB = peopleNumber - peopleA;
-				var moneyAx = Math.ceil(moneyA / 2);
-				var moneyBx = Math.ceil(moneyB / 2);
-				var dayA = Math.floor(moneyAx / peopleA);
-				var dayAx = moneyAx % peopleA;
-				var dayB = Math.floor(moneyBx / peopleB);
-				var dayBx = moneyBx % peopleB;
-				for (var i = 0; i < peopleA; i++) {
-					var peopleInfo = {};
-					peopleInfo.money = 200;
-					peopleInfo.day = dayA + (i < dayAx);
-					if (moneyA % 2 == 1 && i == 0) peopleInfo.day -= 0.5;
-					peopleInfo.totalMoney = 200 * peopleInfo.day;
-					details.push(peopleInfo);
+				difference = 0 - monthMoney;
+				for (var i = 0; i < moneyGroupNum; i++) {
+					difference += moneyGroups[i] * moneyGroupPeopleNumber[i];
 				}
-				for (var i = 0; i < peopleB; i++) {
-					var peopleInfo = {};
-					peopleInfo.money = 180;
-					peopleInfo.day = dayB + (i < dayBx);
-					if (moneyB % 2 == 1 && i == 0) peopleInfo.day -= 0.5;
-					peopleInfo.totalMoney = 180 * peopleInfo.day;
-					details.push(peopleInfo);
-				}
+				console.log("difference:", difference);
 			}
-			while ((peopleB > 0 && details[peopleA].totalMoney > 4999) || (peopleB > 1 && details[peopleA + 1].totalMoney > 4999)) {
-				console.log("发现错误，原因：B组存在月薪大于等于5000的情况，重新计算");
-				console.log(details);
-				details = [];
-				moneyA += 9;
-				moneyB -= 10;
-				if (moneyB < 1) {
-					$("<p>").appendTo("div#panel-show").text("计算错误，请选择其它方案，如单月金额过小请手动计算。").css("padding-left", "15px").css("font-weight", "bold").addClass("text-danger").hide().fadeIn("fast");
-					return false;
-				}
-				var peopleA = Math.round(peopleNumber * moneyA * 10 / halfDayNumber);
-				var peopleB = peopleNumber - peopleA;
-				var moneyAx = Math.ceil(moneyA / 2);
-				var moneyBx = Math.ceil(moneyB / 2);
-				var dayA = Math.floor(moneyAx / peopleA);
-				var dayAx = moneyAx % peopleA;
-				var dayB = Math.floor(moneyBx / peopleB);
-				var dayBx = moneyBx % peopleB;
-				for (var i = 0; i < peopleA; i++) {
+			
+			for (var i = 0; i < moneyGroupNum; i++) {
+				for (var j = 0; j < moneyGroupPeopleNumber[i]; j++) {
 					var peopleInfo = {};
-					peopleInfo.money = 200;
-					peopleInfo.day = dayA + (i < dayAx);
-					if (moneyA % 2 == 1 && i == 0) peopleInfo.day -= 0.5;
-					peopleInfo.totalMoney = 200 * peopleInfo.day;
-					details.push(peopleInfo);
-				}
-				for (var i = 0; i < peopleB; i++) {
-					var peopleInfo = {};
-					peopleInfo.money = 180;
-					peopleInfo.day = dayB + (i < dayBx);
-					if (moneyB % 2 == 1 && i == 0) peopleInfo.day -= 0.5;
-					peopleInfo.totalMoney = 180 * peopleInfo.day;
+					peopleInfo.money = moneyGroupDetails[i][0];
+					peopleInfo.day = moneyGroupDetails[i][1];
+					peopleInfo.totalMoney = moneyGroups[i];
 					details.push(peopleInfo);
 				}
 			}
 
-			console.log("peopleNumber:" + peopleNumber + "  halfDayNumber:" + halfDayNumber);
-			console.log("peopleA:" + peopleA + "  peopleB:" + peopleB);
-			console.log("moneyA:" + moneyA + "  moneyB:" + moneyB);
-			console.log("moneyAx:" + moneyAx + "  moneyBx:" + moneyBx);
-			console.log("dayA:" + dayA + "  dayB:" + dayB);
-			console.log("dayAx:" + dayAx + "  dayBx:" + dayBx);
-			console.log(details);
-			if (monthMoney % 10) {
+			console.log("details:", details);
+			if (difference > 0) {
 				var chiDaoPeople = peopleNumber == 1 ? 0 : (Math.floor(Math.random() * (peopleNumber - 1)) + 1);
-				if (details[chiDaoPeople].day == 0.5) {
-					$("<p>").appendTo("div#panel-show").text("计算错误，请选择其它方案，如单月金额过小请手动计算。").css("padding-left", "15px").css("font-weight", "bold").addClass("text-danger").hide().fadeIn("fast");
-					return false;
-				}
-				details[chiDaoPeople].totalMoney -= 10 - (monthMoney % 10);
+				details[chiDaoPeople].totalMoney -= difference;
+				console.log("chiDaoPeople:", chiDaoPeople);
+				console.log("details:", details);
 			}
 			var sum = 0;
 			for (var i = 0; i < details.length; i++) {
 				sum += details[i].totalMoney;
 			}
+			console.log("sum:", sum);
 			if (sum != monthMoney) {
 				$("<p>").appendTo("div#panel-show").text("计算错误，请选择其它方案，如单月金额过小请手动计算。").css("padding-left", "15px").css("font-weight", "bold").addClass("text-danger").hide().fadeIn("fast");
 				return false;
@@ -328,11 +298,13 @@
 			$("<span>").css("display", "none").css("font-weight", "bold").css("margin", "0 8px 0 24px").addClass("pull-right").appendTo(panel.find("div.panel-heading"));
 			$("<button>").addClass("btn btn-warning btn-xs pull-right").text("复制工资表").appendTo(panel.find("div.panel-heading")).click(function() {
 				var text = "";
-				var end = 5;
-				for (var i = 0; i < details.length; i++, end++) {
-					text += i + 1 + "			" + details[i].totalMoney + "		" + details[i].totalMoney + "		" + details[i].money + "	" + details[i].day + "\n";
+				var line = 6;
+				for (var i = 0; i < details.length; i++, line++) {
+					var kk = details[i].money * details[i].day - details[i].totalMoney;
+					kk = kk ? kk : "";
+					text += i + 1 + "			" + details[i].money + "	" + details[i].day + "	=D" + line + "*E" + line + "	" + kk + "	=F" + line + "-G" + line + "\n";
 				}
-				text += "					" + "=SUM(F6:F" + end + ")"
+				text += "							" + "=SUM(H6:H" + (line - 1) + ")"
 				console.log(text);
 				copyToClipboard(text, $(this));
 			});
