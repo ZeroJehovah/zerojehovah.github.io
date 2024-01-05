@@ -1,3 +1,7 @@
+### 工具网页
+
+> https://zerojehovah.github.io/gkd-subscription/tool.html
+
 ### 原始订阅地址
 
 > https://registry.npmmirror.com/@gkd-kit/subscription/latest/files
@@ -5,6 +9,14 @@
 ### 原始检查更新地址
 
 > https://registry.npmmirror.com/@gkd-kit/subscription/latest/files/dist/gkd.version.json
+
+### GKD项目地址
+
+> https://github.com/gkd-kit/gkd
+
+### GKD订阅项目地址
+
+> https://github.com/gkd-kit/subscription
 
 ### 变更
 
