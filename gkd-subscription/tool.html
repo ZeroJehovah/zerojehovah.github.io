@@ -1,0 +1,60 @@
+<html>
+<head>
+	<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<style>
+		textarea#json {
+			height: calc(100% - 15px - 15px - 34px - 15px) !important;
+			resize: none;
+		}
+		div#btns {
+			margin-top: 15px;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="panel-body">
+		<textarea id="json" class="form-control" readonly="readonly"></textarea>
+		<div id="btns">
+			<button class="btn btn-success" onclick="copy()">复制</button>
+			<button class="btn btn-primary" onclick="link()" style="margin-left: 15px;">前往修改</button>
+		</div>
+	</div>
+	<script>
+		var gkd_url = "https://registry.npmmirror.com/@gkd-kit/subscription/latest/files";
+		var github_url = "https://gitee.com/-/ide/project/icerovah/icerovah/edit/master/-/gkd-subscription/gkd.json5";
+		
+		$.get(gkd_url, function(data) {
+			// console.log("before", data);
+			data = data.replace("id:0,name:'默认订阅'", "id:1,name:'默认订阅转换'");
+			var data_pre = data.substr(0, data.lastIndexOf("apps:"));
+			var data_app = data.substr(data.lastIndexOf("apps:"));
+			data_app = data_app.replaceAll(",enable:false", "");
+			data_app = data_app.replaceAll("enable:false,", "");
+			data = data_pre + data_app;
+			data = data.trim();
+			// console.log("after", data);
+			$("#json").val(data);
+		});
+		
+		function copy() {
+			if (navigator.clipboard) {
+				// clipboard api 复制
+				var json = $("#json").val();
+				navigator.clipboard.writeText(json);
+			} else {
+				// 选中
+				$("#json").select();
+				// 复制
+				document.execCommand('copy', true);
+			}
+		}
+		
+		function link() {
+			window.open(github_url);
+		}
+	</script>
+</body>
+</html>
