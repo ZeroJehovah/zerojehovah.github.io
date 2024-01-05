@@ -2,6 +2,10 @@
 
 > https://zerojehovah.github.io/gkd-subscription/tool.html
 
+### 转换订阅地址
+
+> https://zerojehovah.github.io/gkd-subscription/gkd.json5
+
 ### 原始订阅地址
 
 > https://registry.npmmirror.com/@gkd-kit/subscription/latest/files
