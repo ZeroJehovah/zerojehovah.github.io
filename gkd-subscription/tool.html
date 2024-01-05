@@ -10,57 +10,116 @@
     <link rel="bookmark" href="icon/favicon.ico" />
 
 	<style>
-		p#message {
-			border: 1px solid #ccc;
-			width: 400px;
-			height: 200px;
-			line-height: 200px;
-			text-align: center;
+		div#message {
+			width: 100%;
+			height: 50%;
 			position: absolute;
 			top: 0;
+			left: 0;
+			right: 0;
+		}
+
+		div#btn {
+			width: 100%;
+			height: 50%;
+			position: absolute;
 			bottom: 0;
 			left: 0;
 			right: 0;
+		}
+
+		div#message>*, div#btn>* {
+			display: block;
+			position: absolute;
+			left: 0;
+			right: 0;
 			margin: auto;
+			text-align: center;
+		}
+
+		div#message>* {
+			bottom: 15px;
+			font-size: 20px;
+		}
+
+		div#btn>* {
+			top: 15px;
+			width: 128px;
+			height: 36px;
+			font-size: 18px;
+			line-height: 36px;
+			border: 2px solid #CCC;
 		}
 	</style>
 
 	<script>
-		var gkd_url = "https://registry.npmmirror.com/@gkd-kit/subscription/latest/files";
-		var github_url = "https://github.com/ZeroJehovah/zerojehovah.github.io/edit/master/gkd-subscription/gkd.json5";
-		var json;
+		var gkd_sub_url = "https://registry.npmmirror.com/@gkd-kit/subscription/latest/files";
+		var new_sub_url = "https://zerojehovah.github.io/gkd-subscription/gkd.json5";
+		var new_sub_update_url = "https://github.com/ZeroJehovah/zerojehovah.github.io/edit/master/gkd-subscription/gkd.json5";
+		var gkd_sub_json;
+		var new_sub_json;
 
 		window.onload = function() {
-			var xhr = new XMLHttpRequest();
-			xhr.open('GET', gkd_url, true);
-			xhr.send();
-	
 			show_message("正在获取订阅");
+			ajax(gkd_sub_url, function (data) {
+				gkd_sub_json = data;
+				if (new_sub_json) action();
+			});
+			ajax(new_sub_url, function (data) {
+				new_sub_json = data;
+				if (gkd_sub_json) action();
+			});
+		}
+
+		function ajax(url, callback) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', url, true);
+			xhr.send();
 			xhr.onreadystatechange = function (e) {
 				if (xhr.readyState == 4 && xhr.status == 200) {
-					json = xhr.responseText;
-					convert();
-					show_message("<a href='javascript:copy()'>复制</a>");
+					data = xhr.responseText;
+					callback(data);
 				}
 			};
 		}
 
+		function action() {
+			var gkd_sub_version = check_version(gkd_sub_json);
+			console.log("gkd_sub_version", gkd_sub_version);
+			var new_sub_version = check_version(new_sub_json);
+			console.log("new_sub_version", new_sub_version);
+			if (gkd_sub_version === new_sub_version) {
+				show_message("当前已是最新版本: v" + gkd_sub_version);
+				return;
+			}
+			show_message("检测到新版本: <span class='version'>v" + new_sub_version + " -> v" + gkd_sub_version + "</span>");
+			convert();
+			show_btn("复制", "copy()");
+		}
+
+		function check_version(json) {
+			var version = json.substr(json.indexOf("version:") + 8);
+			version = version.substr(0, version.indexOf("author:") - 1);
+			return version;
+		}
+
 		function convert() {
+			var json = gkd_sub_json;
 			json = json.replace("id:0,name:'默认订阅'", "id:1,name:'默认订阅转换'");
+			json = json.replace(/author:'\w+'/, "author:'zerojehovah'")
 			var json_pre = json.substr(0, json.lastIndexOf("apps:"));
 			var json_app = json.substr(json.lastIndexOf("apps:"));
 			json_app = json_app.replaceAll(",enable:false", "");
 			json_app = json_app.replaceAll("enable:false,", "");
-			json = json_pre + json_app;
-			json = json.trim();
+			new_sub_json = json_pre + json_app;
 			console.log(json);
 		}
 
 		function copy() {
-			show_message("正在复制");
+			show_btn();
 			if (navigator.clipboard) {
 				// clipboard api 复制
-				navigator.clipboard.writeText(json);
+				navigator.clipboard.writeText(new_sub_json);
 			} else {
 				var textarea = document.createElement('textarea');
 				document.body.appendChild(textarea);
@@ -69,7 +128,7 @@
 				textarea.style.clip = 'rect(0 0 0 0)';
 				textarea.style.top = '10px';
 				// 赋值
-				textarea.value = json;
+				textarea.value = new_sub_json;
 				// 选中
 				textarea.select();
 				// 复制
@@ -77,20 +136,32 @@
 				// 移除输入框
 				document.body.removeChild(textarea);
 			}
-			show_message("<a href='javascript:redirect()'>跳转</a>");
+			show_btn("跳转", "redirect()");
 		}
 
 		function redirect() {
-			show_message("正在跳转");
-			window.open(github_url, "_self");
+			window.open(new_sub_update_url, "_self");
 		}
 
-		function show_message(message) {
-			document.getElementById("message").innerHTML = message;
+		function show_message(message, class_name) {
+			if (message) {
+				document.getElementById("message").innerHTML = "<span class='" + class_name + "'>" + message + "</span>";
+			} else {
+				document.getElementById("message").innerHTML = "";
+			}
+		}
+
+		function show_btn(text, href) {
+			if (text) {
+				document.getElementById("btn").innerHTML = "<a href='javascript:" + href + "'>" + text + "</a>";
+			} else {
+				document.getElementById("btn").innerHTML = "";
+			}
 		}
 	</script>
 </head>
 <body>
-	<p id="message"></p>
+	<div id="message"></div>
+	<div id="btn"></div>
 </body>
 </html>
