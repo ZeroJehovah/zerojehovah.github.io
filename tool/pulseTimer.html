@@ -1,0 +1,170 @@
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8"/>
+    <title>运动计时器</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #label {
+            position: absolute;
+            top: 2em;
+            left: 1em;
+            font-size: 4em;
+        }
+
+        #circle {
+            fill: none;
+            stroke: #7C83FD;
+            stroke-width: 8;
+            stroke-dasharray: 314;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            transform-box: fill-box;
+
+            position: absolute;
+            width: 6em;
+            height: 6em;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+
+        #time {
+            position: absolute;
+            width: 6em;
+            height: 6em;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            text-align: center;
+            line-height: 6em;
+            font-size: 6em;
+        }
+
+        button {
+            font-size: 1em;
+        }
+
+        #button {
+            position: absolute;
+            height: 6.125em;
+            bottom: 0;
+            font-size: 4em;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+
+    <script src="https://libs.baidu.com/jquery/2.0.3/jquery.min.js"></script>
+    <script>
+        let labelDiv;
+        let timeDiv;
+        let startBtn;
+        let stopBtn;
+        let circleImg;
+        const progressLen = 314;
+        const labelConfig = ["运动", "休息"]
+        const timeConfig = [60, 10, 60, 10, 60, 10, 60];
+        let stepIndex = -1;
+        let stepStartTime;
+
+        function start() {
+            nextStep();
+            startBtn.hide();
+            stopBtn.show();
+        }
+
+        function stop() {
+            stepIndex = -1;
+        }
+
+        function init() {
+            setLabel("运动计时器");
+            setTime(0);
+        }
+
+        function refresh() {
+            let currentStepTime = timeConfig[stepIndex] * 1000;
+            let stepPastTime = Math.min(currentStepTime, Date.now() - stepStartTime);
+
+            setTime(stepPastTime);
+
+            if (currentStepTime > stepPastTime) {
+                requestAnimationFrame(refresh);
+            } else {
+                requestAnimationFrame(nextStep);
+            }
+        }
+
+        function nextStep() {
+            stepIndex++;
+            if (stepIndex < timeConfig.length) {
+                setStepLabel();
+                stepStartTime = Date.now();
+                refresh();
+            } else {
+                finish();
+            }
+        }
+
+        function finish() {
+            setLabel("结束啦");
+            stepIndex = -1;
+        }
+
+        function setStepLabel() {
+            let label = labelConfig[stepIndex % 2];
+            let currentStepTime = timeConfig[stepIndex] * 1000;
+            setLabel(label + ":" + getFormatTime(currentStepTime));
+        }
+
+        function setLabel(label) {
+            labelDiv.text(label);
+        }
+
+        function setTime(time) {
+            timeDiv.text(getFormatTime(time));
+            let currentStepTime = timeConfig[stepIndex] * 1000;
+            circleImg.css("stroke-dashoffset", progressLen * (1 - time / currentStepTime));
+        }
+
+        function getFormatTime(time) {
+            let min = Math.floor(time / 60000);
+            let sec = Math.floor((time % 60000) / 1000);
+            let millisec = Math.floor((time % 1000) / 10);
+            return (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec + "." + (millisec < 10 ? "0" : "") + millisec;
+        }
+
+        $(function () {
+            labelDiv = $("#label");
+            timeDiv = $("#time");
+            startBtn = $("#start");
+            stopBtn = $("#stop");
+            circleImg = $("#circle");
+            init();
+        });
+    </script>
+</head>
+<body>
+<div id="label"></div>
+<!--<svg>-->
+<!--    <circle id="circle" cx="0" cy="0" r="50" fill="none" stroke-width="8"></circle>-->
+<!--</svg>-->
+<div id="time"></div>
+<div id="button">
+    <button id="start" onclick="start()">开始</button>
+    <button id="pause" style="display: none;">暂停</button>
+    <button id="resume" style="display: none;">继续</button>
+    <button id="stop" onclick="stop()" style="display: none;">停止</button>
+</div>
+</body>
+</html>
