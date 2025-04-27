@@ -43,6 +43,7 @@
             text-align: center;
             line-height: 6em;
             font-size: 6em;
+            font-family: 'Roboto Mono', monospace;
         }
 
         #button {
@@ -223,6 +224,15 @@
             let millisec = Math.floor((time % 1000) / 10);
             return (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec + "." + (millisec < 10 ? "0" : "") + millisec;
         }
+
+        // 请求唤醒锁
+        async function requestWakeLock() {
+            try {
+                await navigator.wakeLock.request('screen');
+            } catch (err) {
+                console.error('请求屏幕常亮失败:', err);
+            }
+        }
     </script>
 
     <script>
@@ -330,6 +340,7 @@
             initBtn();
             initConfig();
             initTime();
+            requestWakeLock();
         });
     </script>
 </head>
