@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼图解题</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #888;
+            overflow: hidden;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 0;
+            border: 2px solid #eee;
+            background: #555;
+
+            width: min(100vw, 600px);
+            height: min(100vw, 600px);
+
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .cell {
+            position: relative;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center,
+                    #000000 48%,
+                    transparent 52%);
+        }
+
+        .cell .colored {
+            position: absolute;
+            border-radius: 10px;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+        }
+
+        /* 连接修饰符 - 扩展到边缘 */
+        .cell.connect-top .colored {
+            top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .cell.connect-bottom .colored {
+            bottom: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .cell.connect-left .colored {
+            left: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .cell.connect-right .colored {
+            right: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="board" id="board"></div>
+
+    <script>
+        // 创建 8x8 棋盘
+        const board = document.getElementById('board');
+        const cells = [];
+        let problem = 6;
+        const positions = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]
+        ];
+        const puzzles = [
+            // 长, 宽, 颜色, 位置x, 位置y 
+            [3, 4, 'blue', 0, 0],
+            [2, 5, 'blue', 0, 0],
+            [3, 3, 'white', 0, 0],
+            [2, 4, 'yellow', 0, 0],
+            [2, 3, 'yellow', 0, 0],
+            [1, 5, 'red', 0, 0],
+            [1, 4, 'red', 0, 0],
+            [2, 2, 'white', 0, 0]
+        ];
+        let steps = 0;
+
+        for (let i = 0; i < 64; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.dataset.index = i;
+            board.appendChild(cell);
+            cells.push(cell);
+            cell.onclick = set_problem;
+        }
+
+        // 着色函数
+        function colorCells(indices, color) {
+            const coloredSet = new Set(indices);
+
+            indices.forEach(index => {
+                const cell = cells[index];
+
+                // 添加色块
+                const block = document.createElement('div');
+                block.className = 'colored';
+                block.style.backgroundColor = color;
+                cell.appendChild(block);
+
+                // 判断连接方向
+                const row = Math.floor(index / 8);
+                const col = index % 8;
+
+                // 上
+                if (row > 0 && coloredSet.has(index - 8)) {
+                    cell.classList.add('connect-top');
+                }
+                // 下
+                if (row < 7 && coloredSet.has(index + 8)) {
+                    cell.classList.add('connect-bottom');
+                }
+                // 左
+                if (col > 0 && coloredSet.has(index - 1)) {
+                    cell.classList.add('connect-left');
+                }
+                // 右
+                if (col < 7 && coloredSet.has(index + 1)) {
+                    cell.classList.add('connect-right');
+                }
+            });
+        }
+
+        function set_problem() {
+            if (problem <= 0) {
+                return;
+            }
+            const index = this.dataset.index;
+            const row = Math.floor(index / 8);
+            const col = index % 8;
+            const cell = cells[index];
+            if (cell.firstChild && cell.firstChild.className === 'colored') {
+                cell.firstChild.remove();
+                positions[row][col] = 0;
+                problem++;
+            } else {
+                colorCells([index], 'black');
+                positions[row][col] = 1;
+                problem--;
+            }
+            if (problem === 0) {
+                setTimeout(() => {
+                    const startTime = new Date().getTime();
+                    console.log("开始计算");
+                    const result = calc(positions, 0);
+                    console.log(`计算结果: ${result ? "成功" : "失败"}, 步数: ${steps}, 耗时: ${new Date().getTime() - startTime}`);
+                    if (result) {
+                        console.log(newPosition);
+                        console.log(puzzles);
+                        showResult();
+                    } else {
+                        alert("无法解出");
+                    }
+                }, 100);
+            }
+        }
+
+        function calc(currentPositions, puzzleIndex) {
+            var puzzle = puzzles[puzzleIndex];
+            const width = puzzle[0];
+            const height = puzzle[1];
+            for (var i = 0; i < 9 - width; i++) {
+                for (var j = 0; j < 9 - height; j++) {
+                    const newPosition = setPuzzle(currentPositions, i, j, puzzle);
+                    steps++;
+                    if (newPosition) {
+                        if (puzzleIndex === puzzles.length - 1) {
+                            return true;
+                        }
+                        if (calc(newPosition, puzzleIndex + 1)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            if (width < height) {
+                puzzle[0] = height;
+                puzzle[1] = width;
+                return calc(currentPositions, puzzleIndex);
+            } else {
+                return false;
+            }
+        }
+
+        function setPuzzle(currentPositions, i, j, puzzle) {
+            var newPosition = structuredClone(currentPositions);
+            for (var pi = 0; pi < puzzle[0]; pi++) {
+                for (var pj = 0; pj < puzzle[1]; pj++) {
+                    const positionX = i + pi;
+                    const positionY = j + pj;
+                    if (newPosition[positionX][positionY] === 0) {
+                        newPosition[positionX][positionY] = 1;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+            puzzle[3] = i;
+            puzzle[4] = j;
+            return newPosition;
+        }
+
+        function showResult() {
+            for (var i = 0; i < puzzles.length; i++) {
+                var cells = [];
+                for (var pi = 0; pi < puzzles[i][0]; pi++) {
+                    for (var pj = 0; pj < puzzles[i][1]; pj++) {
+                        const positionX = puzzles[i][3] + pi;
+                        const positionY = puzzles[i][4] + pj;
+                        cells.push(positionX * 8 + positionY);
+                    }
+                }
+                colorCells(cells, puzzles[i][2]);
+            }
+        }
+
+        // 示例：给图中的区域着色（第2-3行，第1-3列）
+        // colorCells([11, 12, 13, 19, 20, 21]);
+        // colorCells([1, 2, 3, 4], 'blue');
+    </script>
+
+</body>
+
+</html>
