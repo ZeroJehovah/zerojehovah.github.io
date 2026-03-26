@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-cmn-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="author" content="IceRovah, icerovah@gmail.com"/>
 
@@ -11,15 +12,308 @@
   <link rel="shortcut icon" href="resource/icon/favicon.ico"/>
   <link rel="bookmark" href="resource/icon/favicon.ico"/>
 
-  <link rel="stylesheet" type="text/css" href="resource/stylesheet/bootstrap.min.css"/>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg-top: #f7f3eb;
+      --bg-bottom: #dce8f3;
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-border: rgba(33, 55, 88, 0.1);
+      --panel-shadow: 0 24px 48px rgba(41, 61, 88, 0.12);
+      --text-main: #1f2d3d;
+      --text-muted: #5f7187;
+      --accent: #0f5f8a;
+      --accent-strong: #0b4567;
+      --chip: rgba(15, 95, 138, 0.1);
+      --line: rgba(33, 55, 88, 0.08);
+    }
 
-  <script type="text/javascript" src="resource/javascript/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="resource/javascript/bootstrap.min.js"></script>
-  <script type="text/javascript" src="resource/javascript/jquery-3.2.1.min.js"></script>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
+    body {
+      min-height: 100vh;
+      padding: 28px 18px 40px;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.9) 0%, transparent 32%),
+        radial-gradient(circle at right 20%, rgba(151, 196, 221, 0.45) 0%, transparent 28%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+      overflow-x: hidden;
+    }
 
-  <script src='resource/Live2D/lib/live2d.min.js'></script>
-  <script src='resource/Live2D/framework/Live2DFramework.js'></script>
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.4;
+      background-image:
+        radial-gradient(circle at 16% 20%, rgba(15, 95, 138, 0.08) 0 2px, transparent 2px),
+        radial-gradient(circle at 72% 10%, rgba(15, 95, 138, 0.08) 0 1.5px, transparent 1.5px),
+        radial-gradient(circle at 82% 42%, rgba(15, 95, 138, 0.08) 0 2px, transparent 2px),
+        radial-gradient(circle at 30% 72%, rgba(15, 95, 138, 0.08) 0 1.5px, transparent 1.5px);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1180px);
+      margin: 0 auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 16px;
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid var(--panel-border);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--panel-shadow);
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .hero h1 {
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      max-width: 760px;
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--chip);
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    #directory {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section {
+      display: grid;
+      gap: 16px;
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid var(--panel-border);
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--panel-shadow);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head h2 {
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .section-head p {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    .section-count {
+      flex-shrink: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--chip);
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .card,
+    .card-static {
+      display: grid;
+      gap: 10px;
+      min-height: 170px;
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(33, 55, 88, 0.08);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 250, 255, 0.88) 100%);
+      box-shadow: 0 16px 28px rgba(41, 61, 88, 0.08);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .folder-tag,
+    .state-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .folder-tag {
+      background: rgba(15, 95, 138, 0.08);
+      color: var(--accent);
+    }
+
+    .state-tag {
+      background: rgba(165, 112, 42, 0.12);
+      color: #8c5b1d;
+    }
+
+    .card h3,
+    .card-static h3 {
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .card p,
+    .card-static p {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-muted);
+    }
+
+    .path {
+      margin-top: auto;
+      font-family: "SFMono-Regular", "Consolas", monospace;
+      font-size: 13px;
+      color: var(--accent-strong);
+      word-break: break-all;
+    }
+
+    .card-static {
+      cursor: default;
+      opacity: 0.88;
+    }
+
+    #glcanvas {
+      position: fixed;
+      right: clamp(-60px, -3vw, -16px);
+      bottom: -36px;
+      width: min(34vw, 440px);
+      height: min(38vw, 500px);
+      pointer-events: none;
+      opacity: 0.92;
+      z-index: 0;
+    }
+
+    @media (hover: hover) {
+      .card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(15, 95, 138, 0.18);
+        box-shadow: 0 22px 34px rgba(41, 61, 88, 0.14);
+      }
+    }
+
+    @media (max-width: 900px) {
+      #glcanvas {
+        width: min(40vw, 320px);
+        height: min(46vw, 380px);
+        opacity: 0.45;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 16px 12px 24px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .section-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #glcanvas {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">Fomalhaut</p>
+      <h1>站点目录</h1>
+      <p>这里汇总当前站点的全部子页面入口。首页会按目录分组展示，方便同时部署在 GitHub Pages 和 Cloudflare Pages 后快速导航。</p>
+      <div class="hero-meta">
+        <span class="meta-chip" id="pageCount"></span>
+        <span class="meta-chip">自动整理当前 HTML 页面</span>
+      </div>
+    </header>
+
+    <div id="directory"></div>
+  </main>
+
+  <canvas id="glcanvas" width="450" height="500"></canvas>
+
+  <script src="resource/Live2D/lib/live2d.min.js"></script>
+  <script src="resource/Live2D/framework/Live2DFramework.js"></script>
   <script src="resource/Live2D/src/utils/MatrixStack.js"></script>
   <script src="resource/Live2D/src/utils/ModelSettingJson.js"></script>
   <script src="resource/Live2D/src/PlatformManager.js"></script>
@@ -28,14 +322,135 @@
   <script src="resource/Live2D/src/LAppLive2DManager.js"></script>
   <script src="resource/Live2D/src/murakumo.js"></script>
 
+  <script>
+    const sections = [
+      {
+        key: "tool",
+        title: "工具",
+        description: "实验页和日常小工具。"
+      },
+      {
+        key: "genshin",
+        title: "原神",
+        description: "游戏相关页面。"
+      },
+      {
+        key: "gkd-subscription",
+        title: "GKD",
+        description: "订阅转换与维护辅助页。"
+      },
+      {
+        key: "money",
+        title: "财务",
+        description: "计算与分配页面。"
+      }
+    ];
 
-</head>
-<body>
+    const pages = [
+      {
+        section: "tool",
+        title: "拼图解题器",
+        path: "tool/puzzle.html",
+        description: "8x8 棋盘障碍输入后自动求解，支持手机和桌面端。"
+      },
+      {
+        section: "tool",
+        title: "运动计时器",
+        path: "tool/pulseTimer.html",
+        description: "用于运动与休息交替训练的可视化计时器。"
+      },
+      {
+        section: "tool",
+        title: "圣遗物路线",
+        path: "tool/ArtifactRoad.html",
+        description: "按日期轮换显示路线图，并做本地缓存。"
+      },
+      {
+        section: "tool",
+        title: "随机图片",
+        path: "tool/randomImage.html",
+        description: "打开后立即跳转到随机图片资源。"
+      },
+      {
+        section: "tool",
+        title: "PT 搜索跳转",
+        path: "tool/searchPT.html",
+        description: "辅助跳转页，使用时需要附带查询参数。",
+        note: "需参数",
+        disabled: true
+      },
+      {
+        section: "genshin",
+        title: "荧的备忘录",
+        path: "genshin/note.html",
+        description: "原神相关备忘与记录页面。"
+      },
+      {
+        section: "gkd-subscription",
+        title: "GKD订阅转换",
+        path: "gkd-subscription/tool.html",
+        description: "对比上游订阅并生成可复制的转换结果。"
+      },
+      {
+        section: "money",
+        title: "工资计算器 - 清清专用版",
+        path: "money/money.html",
+        description: "按金额、月份和人数拆分工资方案。"
+      }
+    ];
 
-<canvas id="glcanvas" width="450px" height="500px" style="position:fixed;right:0;bottom:-40px;">
-</canvas>
-<script>
-    murakumo();
-</script>
+    function createPageCard(page, sectionTitle) {
+      const tagHtml = page.note ? `<span class="state-tag">${page.note}</span>` : "";
+      const content = `
+        <div class="card-top">
+          <span class="folder-tag">${sectionTitle}</span>
+          ${tagHtml}
+        </div>
+        <h3>${page.title}</h3>
+        <p>${page.description}</p>
+        <div class="path">${page.path}</div>
+      `;
+
+      if (page.disabled) {
+        return `<article class="card-static">${content}</article>`;
+      }
+
+      return `<a class="card" href="${page.path}">${content}</a>`;
+    }
+
+    function renderDirectory() {
+      const container = document.getElementById("directory");
+      const pageCount = document.getElementById("pageCount");
+      pageCount.textContent = `共 ${pages.length} 个子页面`;
+
+      container.innerHTML = sections.map(section => {
+        const sectionPages = pages.filter(page => page.section === section.key);
+        if (sectionPages.length === 0) {
+          return "";
+        }
+
+        return `
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <h2>${section.title}</h2>
+                <p>${section.description}</p>
+              </div>
+              <span class="section-count">${sectionPages.length} 个页面</span>
+            </div>
+            <div class="card-grid">
+              ${sectionPages.map(page => createPageCard(page, section.title)).join("")}
+            </div>
+          </section>
+        `;
+      }).join("");
+    }
+
+    renderDirectory();
+
+    if (typeof murakumo === "function") {
+      murakumo();
+    }
+  </script>
 </body>
 </html>
