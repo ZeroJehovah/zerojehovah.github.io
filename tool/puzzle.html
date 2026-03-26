@@ -6,6 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>拼图解题</title>
     <style>
+        :root {
+            color-scheme: light;
+            --bg-top: #f8efe3;
+            --bg-bottom: #ccb49a;
+            --panel-bg: rgba(255, 248, 240, 0.82);
+            --panel-border: rgba(82, 58, 36, 0.14);
+            --panel-shadow: 0 24px 50px rgba(66, 42, 16, 0.16);
+            --text-main: #2e2118;
+            --text-muted: #755f4f;
+            --accent: #cb5a26;
+            --accent-dark: #a54518;
+            --board-bg: #5a4b40;
+            --board-border: #f6eee3;
+            --shell-bg: rgba(96, 68, 42, 0.14);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,12 +29,115 @@
         }
 
         body {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #888;
-            overflow: hidden;
+            padding: 20px 16px 32px;
+            background:
+                radial-gradient(circle at top, var(--bg-top) 0%, #ead8c4 36%, var(--bg-bottom) 100%);
+            color: var(--text-main);
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            overflow: auto;
+        }
+
+        .app {
+            width: min(100%, 1080px);
+            display: grid;
+            gap: 18px;
+        }
+
+        .panel {
+            display: grid;
+            gap: 16px;
+            padding: 22px;
+            border: 1px solid var(--panel-border);
+            border-radius: 24px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--panel-shadow);
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .panel h1 {
+            font-size: clamp(28px, 4vw, 40px);
+            line-height: 1.05;
+        }
+
+        .description {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-muted);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            min-height: 48px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent) 0%, #e47d43 100%);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            box-shadow: 0 14px 28px rgba(203, 90, 38, 0.22);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .status-card {
+            display: grid;
+            gap: 6px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(82, 58, 36, 0.1);
+        }
+
+        .status-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .status-text {
+            font-size: 22px;
+            line-height: 1.25;
+        }
+
+        .status-meta {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .board-shell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 14px;
+            border-radius: 28px;
+            background: var(--shell-bg);
+            border: 1px solid rgba(82, 58, 36, 0.1);
+            box-shadow: 0 28px 50px rgba(66, 42, 16, 0.12);
         }
 
         .board {
@@ -26,14 +145,14 @@
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
             gap: 0;
-            border: 2px solid #eee;
-            background: #555;
-
-            width: min(100vw, 600px);
-            height: min(100vw, 600px);
-
-            border-radius: 10px;
+            width: 100%;
+            max-width: 680px;
+            aspect-ratio: 1;
+            border: 2px solid var(--board-border);
+            background: var(--board-bg);
+            border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
         }
 
         .cell {
@@ -42,6 +161,10 @@
             background: radial-gradient(circle at center,
                     #000000 48%,
                     transparent 52%);
+            cursor: pointer;
+            user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .cell .colored {
@@ -77,18 +200,88 @@
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }
+
+        .board.is-locked .cell {
+            cursor: default;
+        }
+
+        @media (hover: hover) {
+            .button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 18px 34px rgba(203, 90, 38, 0.26);
+            }
+        }
+
+        @media (min-width: 920px) {
+            .app {
+                grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 14px 12px 24px;
+                align-items: flex-start;
+            }
+
+            .panel {
+                padding: 18px;
+                border-radius: 20px;
+            }
+
+            .board-shell {
+                padding: 10px;
+                border-radius: 22px;
+            }
+
+            .board {
+                border-radius: 16px;
+            }
+
+            .cell .colored {
+                top: 2px;
+                right: 2px;
+                bottom: 2px;
+                left: 2px;
+                border-radius: 8px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="board" id="board"></div>
+    <main class="app">
+        <section class="panel">
+            <p class="eyebrow">8 x 8 Puzzle</p>
+            <h1>拼图解题器</h1>
+            <p class="description">点击棋盘选择 6 个黑格作为障碍。满 6 个后会自动计算剩余区域的拼图摆放，支持桌面端和手机触控。</p>
+            <div class="toolbar">
+                <button class="button" id="resetButton" type="button">重新开始</button>
+            </div>
+            <div class="status-card" aria-live="polite">
+                <span class="status-label">当前状态</span>
+                <strong class="status-text" id="statusText"></strong>
+                <span class="status-meta" id="statusMeta"></span>
+            </div>
+        </section>
+
+        <section class="board-shell">
+            <div class="board" id="board"></div>
+        </section>
+    </main>
 
     <script>
         // 创建 8x8 棋盘
         const board = document.getElementById('board');
+        const resetButton = document.getElementById('resetButton');
+        const statusText = document.getElementById('statusText');
+        const statusMeta = document.getElementById('statusMeta');
         const cells = [];
-        let problem = 6;
+        const REQUIRED_BLOCKS = 6;
+        const CONNECT_CLASSES = ['connect-top', 'connect-bottom', 'connect-left', 'connect-right'];
+        let problem = REQUIRED_BLOCKS;
         const positions = [
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -110,7 +303,22 @@
             [1, 4, 'red', 0, 0],
             [2, 2, 'white', 0, 0]
         ];
+        const initialPuzzles = puzzles.map(puzzle => [...puzzle]);
+        const BOARD_SIZE = 8;
+        const CELL_COUNT = BOARD_SIZE * BOARD_SIZE;
+        const FULL_BOARD_MASK = (1n << BigInt(CELL_COUNT)) - 1n;
+        const pieceTemplates = puzzles.map(([rows, cols, color]) => ({
+            rows,
+            cols,
+            color,
+            area: rows * cols
+        }));
+        const ALL_PIECES_USED_MASK = (1 << pieceTemplates.length) - 1;
         let steps = 0;
+        let isSolving = false;
+        let hasSolved = false;
+        let lastSolveResult = null;
+        let lastDuration = 0;
 
         for (let i = 0; i < 64; i++) {
             const cell = document.createElement('div');
@@ -120,6 +328,8 @@
             cells.push(cell);
             cell.onclick = set_problem;
         }
+        resetButton.onclick = resetGame;
+        updateStatus();
 
         // 着色函数
         function colorCells(indices, color) {
@@ -158,81 +368,398 @@
         }
 
         function set_problem() {
-            if (problem <= 0) {
+            if (isSolving || hasSolved) {
                 return;
             }
-            const index = this.dataset.index;
+            const index = Number(this.dataset.index);
             const row = Math.floor(index / 8);
             const col = index % 8;
             const cell = cells[index];
-            if (cell.firstChild && cell.firstChild.className === 'colored') {
-                cell.firstChild.remove();
+            if (positions[row][col] === 1) {
+                clearCell(cell);
                 positions[row][col] = 0;
                 problem++;
+                lastSolveResult = null;
+                lastDuration = 0;
+                steps = 0;
+                updateStatus();
+                return;
+            }
+
+            if (problem <= 0) {
+                return;
             } else {
                 colorCells([index], 'black');
                 positions[row][col] = 1;
                 problem--;
             }
+            lastSolveResult = null;
+            lastDuration = 0;
+            steps = 0;
+            updateStatus();
             if (problem === 0) {
+                isSolving = true;
+                setBoardLocked(true);
+                updateStatus();
                 setTimeout(() => {
                     const startTime = new Date().getTime();
+                    steps = 0;
                     console.log("开始计算");
-                    const result = calc(positions, 0);
-                    console.log(`计算结果: ${result ? "成功" : "失败"}, 步数: ${steps}, 耗时: ${new Date().getTime() - startTime}`);
+                    const result = calc(positions);
+                    lastDuration = new Date().getTime() - startTime;
+                    lastSolveResult = result;
+                    hasSolved = result;
+                    isSolving = false;
+                    console.log(`计算结果: ${result ? "成功" : "失败"}, 步数: ${steps}, 耗时: ${lastDuration}`);
                     if (result) {
                         console.log(puzzles);
                         showResult();
                     } else {
-                        alert("无法解出");
+                        setBoardLocked(false);
                     }
+                    updateStatus();
                 }, 100);
             }
         }
 
-        function calc(currentPositions, puzzleIndex) {
-            var puzzle = puzzles[puzzleIndex];
-            const width = puzzle[0];
-            const height = puzzle[1];
-            for (var i = 0; i < 9 - width; i++) {
-                for (var j = 0; j < 9 - height; j++) {
-                    const newPosition = setPuzzle(currentPositions, i, j, puzzle);
-                    steps++;
-                    if (newPosition) {
-                        if (puzzleIndex === puzzles.length - 1) {
-                            return true;
-                        }
-                        if (calc(newPosition, puzzleIndex + 1)) {
-                            return true;
-                        }
-                    }
-                }
+        function updateStatus() {
+            if (isSolving) {
+                statusText.textContent = '正在计算解法';
+                statusMeta.textContent = '棋盘已临时锁定，通常会在很短时间内返回结果。';
+                return;
             }
-            if (width < height) {
-                puzzle[0] = height;
-                puzzle[1] = width;
-                return calc(currentPositions, puzzleIndex);
-            } else {
-                return false;
+
+            if (lastSolveResult === true) {
+                statusText.textContent = '已找到解法';
+                statusMeta.textContent = `已搜索 ${steps} 个候选，用时 ${lastDuration} ms。点击“重新开始”可输入下一题。`;
+                return;
+            }
+
+            if (lastSolveResult === false) {
+                statusText.textContent = '当前题型无解';
+                statusMeta.textContent = `已搜索 ${steps} 个候选，用时 ${lastDuration} ms。你可以调整黑格，或直接重新开始。`;
+                return;
+            }
+
+            statusText.textContent = `还需选择 ${problem} 个黑格`;
+            statusMeta.textContent = '点击棋盘设置障碍，满 6 个后会自动开始求解。';
+        }
+
+        function setBoardLocked(locked) {
+            board.classList.toggle('is-locked', locked);
+        }
+
+        function clearCell(cell) {
+            cell.replaceChildren();
+            cell.classList.remove(...CONNECT_CLASSES);
+        }
+
+        function clearBoard() {
+            cells.forEach(clearCell);
+        }
+
+        function resetPositions() {
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    positions[row][col] = 0;
+                }
             }
         }
 
-        function setPuzzle(currentPositions, i, j, puzzle) {
-            var newPosition = structuredClone(currentPositions);
-            for (var pi = 0; pi < puzzle[0]; pi++) {
-                for (var pj = 0; pj < puzzle[1]; pj++) {
-                    const positionX = i + pi;
-                    const positionY = j + pj;
-                    if (newPosition[positionX][positionY] === 0) {
-                        newPosition[positionX][positionY] = 1;
-                    } else {
-                        return null;
+        function resetPuzzles() {
+            initialPuzzles.forEach((initialPuzzle, index) => {
+                puzzles[index][0] = initialPuzzle[0];
+                puzzles[index][1] = initialPuzzle[1];
+                puzzles[index][2] = initialPuzzle[2];
+                puzzles[index][3] = initialPuzzle[3];
+                puzzles[index][4] = initialPuzzle[4];
+            });
+        }
+
+        function resetGame() {
+            problem = REQUIRED_BLOCKS;
+            steps = 0;
+            isSolving = false;
+            hasSolved = false;
+            lastSolveResult = null;
+            lastDuration = 0;
+            resetPositions();
+            resetPuzzles();
+            clearBoard();
+            setBoardLocked(false);
+            updateStatus();
+        }
+
+        function calc(currentPositions) {
+            const { occupiedMask, blockedCount } = buildBoardMask(currentPositions);
+            const totalPieceArea = pieceTemplates.reduce((sum, piece) => sum + piece.area, 0);
+            if (CELL_COUNT - blockedCount !== totalPieceArea) {
+                return false;
+            }
+
+            const placementsByPiece = buildPlacements(occupiedMask);
+            if (placementsByPiece.some(placements => placements.length === 0)) {
+                return false;
+            }
+
+            const placementsByCell = buildPlacementsByCell(placementsByPiece);
+            const solution = new Array(pieceTemplates.length).fill(null);
+            const deadStates = new Set();
+
+            if (!searchSolution(occupiedMask, 0, placementsByPiece, placementsByCell, solution, deadStates)) {
+                return false;
+            }
+
+            applySolution(solution);
+            return true;
+        }
+
+        function buildBoardMask(currentPositions) {
+            let occupiedMask = 0n;
+            let blockedCount = 0;
+
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    if (currentPositions[row][col] === 1) {
+                        occupiedMask |= getCellBit(getCellIndex(row, col));
+                        blockedCount++;
                     }
                 }
             }
-            puzzle[3] = i;
-            puzzle[4] = j;
-            return newPosition;
+
+            return { occupiedMask, blockedCount };
+        }
+
+        function getCellIndex(row, col) {
+            return row * BOARD_SIZE + col;
+        }
+
+        function getCellBit(cellIndex) {
+            return 1n << BigInt(cellIndex);
+        }
+
+        function buildPlacements(blockedMask) {
+            return pieceTemplates.map((piece, pieceIndex) => {
+                const placements = [];
+                const orientations = [[piece.rows, piece.cols]];
+
+                if (piece.rows !== piece.cols) {
+                    orientations.push([piece.cols, piece.rows]);
+                }
+
+                for (const [rows, cols] of orientations) {
+                    for (let row = 0; row <= BOARD_SIZE - rows; row++) {
+                        for (let col = 0; col <= BOARD_SIZE - cols; col++) {
+                            const placement = buildPlacement(pieceIndex, row, col, rows, cols);
+                            if ((placement.mask & blockedMask) === 0n) {
+                                placements.push(placement);
+                            }
+                        }
+                    }
+                }
+
+                return placements;
+            });
+        }
+
+        function buildPlacement(pieceIndex, row, col, rows, cols) {
+            let mask = 0n;
+            const cells = [];
+
+            for (let rowOffset = 0; rowOffset < rows; rowOffset++) {
+                for (let colOffset = 0; colOffset < cols; colOffset++) {
+                    const cellIndex = getCellIndex(row + rowOffset, col + colOffset);
+                    mask |= getCellBit(cellIndex);
+                    cells.push(cellIndex);
+                }
+            }
+
+            return {
+                pieceIndex,
+                row,
+                col,
+                rows,
+                cols,
+                mask,
+                cells
+            };
+        }
+
+        function buildPlacementsByCell(placementsByPiece) {
+            const placementsByCell = Array.from({ length: CELL_COUNT }, () => []);
+
+            placementsByPiece.forEach(placements => {
+                placements.forEach(placement => {
+                    placement.cells.forEach(cellIndex => {
+                        placementsByCell[cellIndex].push(placement);
+                    });
+                });
+            });
+
+            return placementsByCell;
+        }
+
+        function searchSolution(occupiedMask, usedMask, placementsByPiece, placementsByCell, solution, deadStates) {
+            if (usedMask === ALL_PIECES_USED_MASK) {
+                return occupiedMask === FULL_BOARD_MASK;
+            }
+
+            const cacheKey = `${usedMask}:${occupiedMask.toString(36)}`;
+            if (deadStates.has(cacheKey)) {
+                return false;
+            }
+
+            if (!passesAreaPrune(occupiedMask, usedMask)) {
+                deadStates.add(cacheKey);
+                return false;
+            }
+
+            let bestCandidates = null;
+            let bestCount = Infinity;
+
+            for (let cellIndex = 0; cellIndex < CELL_COUNT; cellIndex++) {
+                if ((occupiedMask & getCellBit(cellIndex)) !== 0n) {
+                    continue;
+                }
+
+                const candidates = [];
+                for (const placement of placementsByCell[cellIndex]) {
+                    if ((usedMask & (1 << placement.pieceIndex)) !== 0) {
+                        continue;
+                    }
+                    if ((occupiedMask & placement.mask) !== 0n) {
+                        continue;
+                    }
+                    candidates.push(placement);
+                }
+
+                if (candidates.length === 0) {
+                    deadStates.add(cacheKey);
+                    return false;
+                }
+
+                if (candidates.length < bestCount) {
+                    bestCount = candidates.length;
+                    bestCandidates = candidates;
+                    if (bestCount === 1) {
+                        break;
+                    }
+                }
+            }
+
+            bestCandidates.sort((left, right) => {
+                const freedomDiff = placementsByPiece[left.pieceIndex].length - placementsByPiece[right.pieceIndex].length;
+                if (freedomDiff !== 0) {
+                    return freedomDiff;
+                }
+                return pieceTemplates[right.pieceIndex].area - pieceTemplates[left.pieceIndex].area;
+            });
+
+            for (const placement of bestCandidates) {
+                steps++;
+                solution[placement.pieceIndex] = placement;
+
+                if (searchSolution(
+                    occupiedMask | placement.mask,
+                    usedMask | (1 << placement.pieceIndex),
+                    placementsByPiece,
+                    placementsByCell,
+                    solution,
+                    deadStates
+                )) {
+                    return true;
+                }
+
+                solution[placement.pieceIndex] = null;
+            }
+
+            deadStates.add(cacheKey);
+            return false;
+        }
+
+        function passesAreaPrune(occupiedMask, usedMask) {
+            const reachable = new Uint8Array(CELL_COUNT + 1);
+            const remainingAreas = [];
+            let minArea = Infinity;
+
+            reachable[0] = 1;
+            for (let pieceIndex = 0; pieceIndex < pieceTemplates.length; pieceIndex++) {
+                if ((usedMask & (1 << pieceIndex)) !== 0) {
+                    continue;
+                }
+
+                const area = pieceTemplates[pieceIndex].area;
+                remainingAreas.push(area);
+                minArea = Math.min(minArea, area);
+
+                for (let sum = CELL_COUNT - area; sum >= 0; sum--) {
+                    if (reachable[sum]) {
+                        reachable[sum + area] = 1;
+                    }
+                }
+            }
+
+            if (remainingAreas.length === 0) {
+                return true;
+            }
+
+            const visited = new Uint8Array(CELL_COUNT);
+            const stack = [];
+
+            for (let startCell = 0; startCell < CELL_COUNT; startCell++) {
+                if (visited[startCell] || (occupiedMask & getCellBit(startCell)) !== 0n) {
+                    continue;
+                }
+
+                let componentSize = 0;
+                stack.push(startCell);
+                visited[startCell] = 1;
+
+                while (stack.length > 0) {
+                    const cellIndex = stack.pop();
+                    componentSize++;
+
+                    const row = Math.floor(cellIndex / BOARD_SIZE);
+                    const col = cellIndex % BOARD_SIZE;
+
+                    if (row > 0) {
+                        tryVisitCell(row - 1, col, occupiedMask, visited, stack);
+                    }
+                    if (row < BOARD_SIZE - 1) {
+                        tryVisitCell(row + 1, col, occupiedMask, visited, stack);
+                    }
+                    if (col > 0) {
+                        tryVisitCell(row, col - 1, occupiedMask, visited, stack);
+                    }
+                    if (col < BOARD_SIZE - 1) {
+                        tryVisitCell(row, col + 1, occupiedMask, visited, stack);
+                    }
+                }
+
+                if (componentSize < minArea || !reachable[componentSize]) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function tryVisitCell(row, col, occupiedMask, visited, stack) {
+            const cellIndex = getCellIndex(row, col);
+            if (visited[cellIndex] || (occupiedMask & getCellBit(cellIndex)) !== 0n) {
+                return;
+            }
+            visited[cellIndex] = 1;
+            stack.push(cellIndex);
+        }
+
+        function applySolution(solution) {
+            solution.forEach((placement, pieceIndex) => {
+                puzzles[pieceIndex][0] = placement.rows;
+                puzzles[pieceIndex][1] = placement.cols;
+                puzzles[pieceIndex][3] = placement.row;
+                puzzles[pieceIndex][4] = placement.col;
+            });
         }
 
         function showResult() {
