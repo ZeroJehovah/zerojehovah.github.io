@@ -53,6 +53,42 @@ git push origin <branch-name>
 
 其中，`<branch-name>` 应替换为当前分支名称。
 
+## WSL 项目与 Windows 预览规则
+
+这是一个运行在 **WSL** 中的项目，但用户需要在 **Windows 浏览器** 中查看效果。
+
+当 Agent 修改了 `.html` 文件后，必须额外告知用户该文件对应的 **Windows 可直接打开的 `file://` 路径**，以便用户在 Windows 浏览器中预览。
+
+### 路径转换规则
+
+如果 WSL 中的文件路径为：
+
+```
+/home/<user>/<project>/path/to/file.html
+```
+
+则应转换并展示为 Windows 可访问路径：
+
+```
+file://wsl.localhost/<发行版名称>/home/<user>/<project>/path/to/file.html
+```
+
+### 输出要求
+
+当修改了 HTML 文件后，Agent 除了说明修改内容外，还应额外输出：
+
+```
+可在 Windows 浏览器中直接打开预览：
+file://wsl.localhost/<发行版名称>/home/<user>/<project>/path/to/file.html
+```
+
+### 注意事项
+
+* 仅当修改了 `.html` 文件时，才需要提供对应的 Windows `file://` 路径
+* 路径必须与实际被修改的文件一一对应
+* 不要只给出 WSL 路径，必须给出可在 Windows 浏览器中直接打开的 `file://` 路径
+* 如果修改了多个 HTML 文件，应分别列出各自可打开的路径
+
 ## 注意事项
 
 * 未明确要求时，禁止自动提交代码
