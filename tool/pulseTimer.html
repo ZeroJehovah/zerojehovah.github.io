@@ -1,101 +1,450 @@
-<html lang="zh-cn">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta name="theme-color" content="#f06a3b"/>
     <title>运动计时器</title>
 
     <style>
-        html, body {
+        :root {
+            color-scheme: light;
+            --accent: #f06a3b;
+            --accent-deep: #cd4d21;
+            --accent-soft: rgba(240, 106, 59, 0.16);
+            --ring-track: rgba(31, 42, 55, 0.1);
+            --text-main: #1f2a37;
+            --text-muted: #5f6f82;
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --panel-border: rgba(31, 42, 55, 0.08);
+            --panel-shadow: 0 28px 60px rgba(31, 42, 55, 0.16);
+            --button-shadow: 0 18px 32px rgba(240, 106, 59, 0.26);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
             margin: 0;
-            padding: 0;
-            background-color: #F7F7F7;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "SF Pro Rounded", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text-main);
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.9) 0%, transparent 30%),
+                radial-gradient(circle at 85% 10%, rgba(240, 106, 59, 0.22) 0%, transparent 22%),
+                linear-gradient(180deg, #fff5ed 0%, #f7efe9 42%, #efe7ff 100%);
+            transition: background 0.24s ease, color 0.24s ease;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        body[data-phase="exercise"] {
+            --accent: #2d7eff;
+            --accent-deep: #175dc9;
+            --accent-soft: rgba(45, 126, 255, 0.16);
+            --button-shadow: 0 18px 32px rgba(45, 126, 255, 0.24);
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.92) 0%, transparent 30%),
+                radial-gradient(circle at 85% 10%, rgba(45, 126, 255, 0.24) 0%, transparent 24%),
+                linear-gradient(180deg, #eef6ff 0%, #f4f7ff 48%, #eef3ff 100%);
+        }
+
+        body[data-phase="rest"] {
+            --accent: #23a06b;
+            --accent-deep: #16714a;
+            --accent-soft: rgba(35, 160, 107, 0.16);
+            --button-shadow: 0 18px 32px rgba(35, 160, 107, 0.24);
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.92) 0%, transparent 30%),
+                radial-gradient(circle at 85% 10%, rgba(35, 160, 107, 0.22) 0%, transparent 24%),
+                linear-gradient(180deg, #eefbf4 0%, #f5fbf8 48%, #eef8f4 100%);
+        }
+
+        body[data-phase="paused"] {
+            --accent: #c3831f;
+            --accent-deep: #905d0e;
+            --accent-soft: rgba(195, 131, 31, 0.18);
+            --button-shadow: 0 18px 32px rgba(195, 131, 31, 0.24);
+        }
+
+        body[data-phase="finished"] {
+            --accent: #b84fd3;
+            --accent-deep: #8a2fa3;
+            --accent-soft: rgba(184, 79, 211, 0.16);
+            --button-shadow: 0 18px 32px rgba(184, 79, 211, 0.24);
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.92) 0%, transparent 30%),
+                radial-gradient(circle at 85% 10%, rgba(184, 79, 211, 0.24) 0%, transparent 24%),
+                linear-gradient(180deg, #fbf0ff 0%, #f8f1ff 48%, #f2efff 100%);
+        }
+
+        .app {
+            min-height: 100vh;
+            padding:
+                calc(env(safe-area-inset-top) + 18px)
+                16px
+                calc(env(safe-area-inset-bottom) + 18px);
+            display: grid;
+            place-items: center;
+        }
+
+        .timer-card {
+            width: min(100%, 480px);
+            min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 36px);
+            padding: 22px 18px 18px;
+            border-radius: 32px;
+            border: 1px solid var(--panel-border);
+            background: var(--panel-bg);
+            backdrop-filter: blur(18px);
+            box-shadow: var(--panel-shadow);
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 18px;
+        }
+
+        .header {
+            display: grid;
+            gap: 10px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .tip-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .tip-toggle {
+            min-height: 36px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(31, 42, 55, 0.08);
+            background: rgba(255, 255, 255, 0.78);
+            color: var(--accent-deep);
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 10px 22px rgba(31, 42, 55, 0.08);
+        }
+
+        .tip-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            z-index: 5;
+            width: min(280px, calc(100vw - 48px));
+            padding: 14px 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(31, 42, 55, 0.08);
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 22px 36px rgba(31, 42, 55, 0.16);
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .tip-panel[hidden] {
+            display: none;
+        }
+
+        .tip-panel strong {
+            color: var(--text-main);
         }
 
         #label {
-            position: absolute;
-            top: 2em;
-            left: 1em;
-            font-size: 4em;
+            min-height: 92px;
         }
 
-        svg {
+        #label > * {
+            margin: 0;
+        }
+
+        #title,
+        #exercise-message,
+        #finish-message {
+            display: none;
+            font-size: clamp(30px, 8vw, 42px);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -0.04em;
+        }
+
+        #exercise-message {
+            display: none;
+            flex-wrap: wrap;
+            gap: 0.12em;
+            align-items: baseline;
+        }
+
+        #step-type {
+            color: var(--accent);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .summary-chip {
+            padding: 12px 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(31, 42, 55, 0.06);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        .summary-chip span {
+            display: block;
+            font-size: 12px;
+            line-height: 1.2;
+            color: var(--text-muted);
+        }
+
+        .summary-chip strong {
+            display: block;
+            margin-top: 6px;
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .timer-shell {
+            align-self: center;
+            width: min(100%, 348px);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timer-svg {
             width: 100%;
             height: 100%;
+            display: block;
+            overflow: visible;
+        }
+
+        #track,
+        #circle {
+            fill: none;
+            stroke-width: 8;
+        }
+
+        #track {
+            stroke: var(--ring-track);
         }
 
         #circle {
-            fill: none;
-            stroke-width: 2em;
+            stroke: var(--accent);
+            stroke-linecap: round;
             transform: rotate(-90deg);
             transform-origin: center;
-            transform-box: fill-box;
-            stroke-linecap: round;
+            transition: stroke 0.18s ease;
+            filter: drop-shadow(0 12px 20px var(--accent-soft));
+        }
+
+        .timer-center {
+            position: absolute;
+            inset: 13%;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 56%, rgba(255, 255, 255, 0.48) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.72),
+                0 20px 40px rgba(31, 42, 55, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px 18px 18px;
         }
 
         #time {
-            position: absolute;
-            width: 6em;
-            height: 6em;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            margin: auto;
-            text-align: center;
-            line-height: 6em;
-            font-size: 6em;
-            font-family: 'Roboto Mono', monospace;
+            font-family: "Roboto Mono", "SFMono-Regular", "Consolas", monospace;
+            font-size: clamp(34px, 11vw, 60px);
+            line-height: 1;
+            letter-spacing: -0.05em;
+            font-weight: 700;
+            color: var(--text-main);
+            transform: translateY(5px);
+        }
+
+        .timer-meta {
+            margin-top: 18px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .phase-caption {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent-deep);
+        }
+
+        .round-caption {
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--text-muted);
         }
 
         #button {
-            position: absolute;
-            height: 6.125em;
-            bottom: 0;
-            font-size: 4em;
+            display: flex;
+            align-items: stretch;
+            gap: 10px;
+            margin-top: auto;
             width: 100%;
-            text-align: center;
+        }
+
+        .primary-slot {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .primary-slot button {
+            width: 100%;
         }
 
         button {
-            font-size: 1em;
-            width: 5em;
-            height: 2em;
-            background-color: #FFF;
+            min-height: 60px;
+            padding: 0 18px;
             border: none;
-            border-radius: 2em;
-            box-shadow: -2px -2px 4px #EEE, 12px 12px 16px #EEE;
-            color: #337ab7;
+            border-radius: 18px;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
         }
 
-        #stop {
-            color: #a94442;
-            margin-left: 1em;
+        button:active {
+            transform: translateY(1px) scale(0.99);
         }
 
+        .primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+            color: #fff;
+            box-shadow: var(--button-shadow);
+        }
+
+        .secondary {
+            flex: 0 0 92px;
+            width: 92px;
+            min-height: 60px;
+            padding: 0 12px;
+            border: 1px solid rgba(162, 71, 61, 0.12);
+            background: rgba(255, 255, 255, 0.86);
+            color: #a2473d;
+            box-shadow: 0 10px 20px rgba(31, 42, 55, 0.08);
+        }
+
+        @media (min-width: 640px) {
+            .app {
+                padding: 24px;
+            }
+
+            .timer-card {
+                min-height: 760px;
+                padding: 28px 24px 24px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .timer-card {
+                border-radius: 28px;
+                gap: 16px;
+            }
+
+            #button {
+                gap: 8px;
+            }
+
+            button {
+                min-height: 56px;
+                font-size: 16px;
+                padding: 0 14px;
+            }
+
+            .secondary {
+                flex-basis: 78px;
+                width: 78px;
+                min-height: 56px;
+                padding: 0 10px;
+            }
+        }
     </style>
 
-    <script src="https://libs.baidu.com/jquery/2.0.3/jquery.min.js"></script>
+    <script src="../resource/javascript/jquery-3.2.1.min.js"></script>
 
     <script>
-        let labelDiv, timeDiv, circleImg;
-        let titleSpan, exerciseMessageSpan, finishMessageSpan;
-        let exerciseIndexSpan, stepTypeSpan, stepTimeSpan;
-        let startBtn, pauseBtn, resumeBtn, stopBtn;
+        let labelDiv;
+        let timeDiv;
+        let circleImg;
+        let titleSpan;
+        let exerciseMessageSpan;
+        let finishMessageSpan;
+        let exerciseIndexSpan;
+        let stepTypeSpan;
+        let stepTimeSpan;
+        let startBtn;
+        let pauseBtn;
+        let resumeBtn;
+        let stopBtn;
+        let phaseCaption;
+        let roundCaption;
+        let summaryExerciseSpan;
+        let summaryRestSpan;
+        let summaryCountSpan;
+        let summaryTotalSpan;
+        let tipToggleBtn;
+        let tipPanel;
 
-        let perimeter; // 周长
-
-        const labelTemplate = ["运动", "休息"];
-        const circleColorTemplate = ["#337ab7", "#5cb85c"];
-        const labelConfig = [], circleColorConfig = [], timeConfig = [];
-
+        let perimeter;
+        let wakeLock = null;
         let stepIndex;
         let stepStartTime;
         let running;
         let pauseTime;
-    </script>
 
-    <script>
+        const CIRCLE_RADIUS = 44;
+        const labelTemplate = ["运动", "休息"];
+        const circleColorTemplate = ["#2d7eff", "#23a06b"];
+        const labelConfig = [];
+        const circleColorConfig = [];
+        const timeConfig = [];
+        const sessionConfig = {
+            exercise: 2,
+            rest: 1,
+            count: 2
+        };
+
         function start() {
             running = true;
+            requestWakeLock();
             nextStep();
 
             startBtn.fadeOut("fast", function () {
@@ -107,6 +456,11 @@
         function pause() {
             running = false;
             pauseTime = Date.now();
+            setTheme("paused");
+            circleImg.css("stroke", "var(--accent)");
+            phaseCaption.text("已暂停");
+            roundCaption.text(getRoundText());
+            releaseWakeLock();
 
             pauseBtn.fadeOut("fast", function () {
                 resumeBtn.fadeIn("fast");
@@ -115,9 +469,9 @@
 
         function resume() {
             running = true;
-            let resumeTime = Date.now();
-            let pauseDelay = resumeTime - pauseTime;
-            stepStartTime += pauseDelay;
+            stepStartTime += Date.now() - pauseTime;
+            requestWakeLock();
+            setStepCircle();
             refresh();
 
             resumeBtn.fadeOut("fast", function () {
@@ -126,6 +480,7 @@
         }
 
         function stop() {
+            releaseWakeLock();
             initTime();
 
             pauseBtn.fadeOut("fast");
@@ -134,9 +489,7 @@
                 startBtn.fadeIn("fast");
             });
         }
-    </script>
 
-    <script>
         function nextStep() {
             stepIndex++;
             if (stepIndex < timeConfig.length) {
@@ -167,9 +520,14 @@
         }
 
         function finish() {
-            setLabel(finishMessageSpan);
             running = false;
+            setTheme("finished");
+            circleImg.css("stroke", "var(--accent)");
+            showOnlyLabel(finishMessageSpan);
+            phaseCaption.text("训练完成");
+            roundCaption.text("共完成 " + sessionConfig.count + " 轮");
             stepIndex = -1;
+            releaseWakeLock();
             startBtn.show();
             pauseBtn.hide();
             resumeBtn.hide();
@@ -177,44 +535,35 @@
         }
 
         function setStepLabel() {
-            labelDiv.fadeOut("fast", function () {
-                titleSpan.hide();
-                exerciseMessageSpan.hide();
-                finishMessageSpan.hide();
-                labelDiv.show();
-
-                exerciseIndexSpan.text(Math.floor(stepIndex / 2) + 1);
-                stepTypeSpan.css("color", circleColorConfig[stepIndex]).text(labelConfig[stepIndex]);
-                stepTimeSpan.text(timeConfig[stepIndex]);
-                exerciseMessageSpan.fadeIn("fast");
-            });
+            exerciseIndexSpan.text(Math.floor(stepIndex / 2) + 1);
+            stepTypeSpan.css("color", circleColorConfig[stepIndex]).text(labelConfig[stepIndex]);
+            stepTimeSpan.text(timeConfig[stepIndex]);
+            phaseCaption.text(labelConfig[stepIndex]);
+            roundCaption.text(getRoundText());
+            showOnlyLabel(exerciseMessageSpan);
         }
 
-        function setLabel(span) {
-            labelDiv.fadeOut("fast", function () {
-                titleSpan.hide();
-                exerciseMessageSpan.hide();
-                finishMessageSpan.hide();
-                labelDiv.show();
-
-                span.fadeIn("fast");
-            });
+        function showOnlyLabel(target) {
+            labelDiv.children().stop(true, true).hide();
+            target.stop(true, true).fadeIn("fast");
         }
 
         function setStepCircle() {
-            let circleColor = circleColorConfig[stepIndex];
-            circleImg.css("stroke", circleColor);
+            let isExercise = stepIndex % 2 === 0;
+            setTheme(isExercise ? "exercise" : "rest");
+            circleImg.css("stroke", circleColorConfig[stepIndex]);
         }
 
         function setTime(time) {
             timeDiv.text(getFormatTime(time));
-            let dashoffset;
+
             if (stepIndex === -1) {
-                dashoffset = perimeter;
-            } else {
-                let currentStepTime = timeConfig[stepIndex] * 1000;
-                dashoffset = perimeter * (1 - time / currentStepTime);
+                circleImg.css("stroke-dashoffset", perimeter);
+                return;
             }
+
+            let currentStepTime = timeConfig[stepIndex] * 1000;
+            let dashoffset = perimeter * (1 - time / currentStepTime);
             circleImg.css("stroke-dashoffset", dashoffset);
         }
 
@@ -225,44 +574,74 @@
             return (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec + "." + (millisec < 10 ? "0" : "") + millisec;
         }
 
-        // 请求唤醒锁
+        function getRoundText() {
+            if (stepIndex < 0) {
+                return "共 " + sessionConfig.count + " 轮";
+            }
+            return "第 " + (Math.floor(stepIndex / 2) + 1) + " / " + sessionConfig.count + " 轮";
+        }
+
+        function setTheme(phase) {
+            document.body.setAttribute("data-phase", phase);
+        }
+
         async function requestWakeLock() {
+            if (!("wakeLock" in navigator)) {
+                return;
+            }
+
+            if (wakeLock) {
+                return;
+            }
+
             try {
-                await navigator.wakeLock.request('screen');
+                wakeLock = await navigator.wakeLock.request("screen");
             } catch (err) {
-                console.error('请求屏幕常亮失败:', err);
+                console.error("请求屏幕常亮失败:", err);
             }
         }
-    </script>
 
-    <script>
+        async function releaseWakeLock() {
+            if (!wakeLock) {
+                return;
+            }
+
+            try {
+                await wakeLock.release();
+            } catch (err) {
+                console.error("释放屏幕常亮失败:", err);
+            } finally {
+                wakeLock = null;
+            }
+        }
+
         function initDom() {
+            labelDiv = $("#label");
+            timeDiv = $("#time");
+            circleImg = $("#circle");
             titleSpan = $("#title");
             exerciseMessageSpan = $("#exercise-message");
             finishMessageSpan = $("#finish-message");
             exerciseIndexSpan = $("#exercise-index");
             stepTypeSpan = $("#step-type");
             stepTimeSpan = $("#step-time");
-            labelDiv = $("#label");
-            timeDiv = $("#time");
             startBtn = $("#start");
             pauseBtn = $("#pause");
             resumeBtn = $("#resume");
             stopBtn = $("#stop");
-            circleImg = $("#circle");
+            phaseCaption = $("#phase-caption");
+            roundCaption = $("#round-caption");
+            summaryExerciseSpan = $("#summary-exercise");
+            summaryRestSpan = $("#summary-rest");
+            summaryCountSpan = $("#summary-count");
+            summaryTotalSpan = $("#summary-total");
+            tipToggleBtn = $("#tip-toggle");
+            tipPanel = $("#tip-panel");
         }
 
         function initCircle() {
-            let circleR = timeDiv.width() / 2;
-            let circleCx = timeDiv.offset().left + circleR;
-            let circleCy = timeDiv.offset().top + circleR;
-            perimeter = 2 * Math.PI * circleR;
-            circleImg
-                .css("stroke-dasharray", perimeter)
-                .attr("cx", circleCx)
-                .attr("cy", circleCy)
-                .attr("r", circleR)
-                .show();
+            perimeter = 2 * Math.PI * CIRCLE_RADIUS;
+            circleImg.css("stroke-dasharray", perimeter).css("stroke-dashoffset", perimeter);
         }
 
         function initBtn() {
@@ -274,26 +653,83 @@
 
         function initConfig() {
             let urlParams = readUrlParam();
-            let exercise = urlParams["exercise"] || 2;
-            let rest = urlParams["rest"] || 1;
-            let count = urlParams["count"] || 2;
+            sessionConfig.exercise = parsePositiveNumber(urlParams.exercise, 2);
+            sessionConfig.rest = parsePositiveNumber(urlParams.rest, 1);
+            sessionConfig.count = parsePositiveInteger(urlParams.count, 2);
 
-            for (let index = 0; index < count; index ++) {
+            labelConfig.length = 0;
+            circleColorConfig.length = 0;
+            timeConfig.length = 0;
+
+            for (let index = 0; index < sessionConfig.count; index++) {
                 labelConfig.push(labelTemplate[0]);
                 circleColorConfig.push(circleColorTemplate[0]);
-                timeConfig.push(exercise);
-                if (index < count - 1) {
+                timeConfig.push(sessionConfig.exercise);
+
+                if (index < sessionConfig.count - 1) {
                     labelConfig.push(labelTemplate[1]);
                     circleColorConfig.push(circleColorTemplate[1]);
-                    timeConfig.push(rest);
+                    timeConfig.push(sessionConfig.rest);
                 }
             }
+
+            renderSummary();
+        }
+
+        function renderSummary() {
+            let totalSeconds = sessionConfig.exercise * sessionConfig.count;
+            if (sessionConfig.count > 1) {
+                totalSeconds += sessionConfig.rest * (sessionConfig.count - 1);
+            }
+
+            summaryExerciseSpan.text(formatSecondLabel(sessionConfig.exercise));
+            summaryRestSpan.text(sessionConfig.count > 1 ? formatSecondLabel(sessionConfig.rest) : "无休息");
+            summaryCountSpan.text(sessionConfig.count + " 轮");
+            summaryTotalSpan.text(formatDurationLabel(totalSeconds));
+        }
+
+        function formatSecondLabel(second) {
+            if (Number.isInteger(second)) {
+                return second + " 秒";
+            }
+            return second + " 秒";
+        }
+
+        function formatDurationLabel(totalSeconds) {
+            if (totalSeconds < 60) {
+                return totalSeconds + " 秒";
+            }
+
+            let min = Math.floor(totalSeconds / 60);
+            let sec = totalSeconds % 60;
+
+            if (sec === 0) {
+                return min + " 分钟";
+            }
+
+            return min + " 分 " + sec + " 秒";
+        }
+
+        function parsePositiveNumber(value, fallback) {
+            let num = Number(value);
+            if (!Number.isFinite(num) || num <= 0) {
+                return fallback;
+            }
+            return num;
+        }
+
+        function parsePositiveInteger(value, fallback) {
+            let num = parseInt(value, 10);
+            if (!Number.isFinite(num) || num <= 0) {
+                return fallback;
+            }
+            return num;
         }
 
         function readUrlParam() {
             let paramJson = {};
-
             let paramStr = location.search;
+
             if (!paramStr || !paramStr.startsWith("?")) {
                 return paramJson;
             }
@@ -318,8 +754,8 @@
                     continue;
                 }
 
-                paramJson[paramPair[0]] = paramPair[1];
-                console.log("urlParam: " + paramPair[0] + " = " + paramPair[1]);
+                paramJson[paramPair[0]] = decodeURIComponent(paramPair[1]);
+                console.log("urlParam: " + paramPair[0] + " = " + paramJson[paramPair[0]]);
             }
 
             return paramJson;
@@ -328,45 +764,116 @@
         function initTime() {
             running = false;
             stepIndex = -1;
-            setLabel(titleSpan);
+            setTheme("idle");
+            circleImg.css("stroke", "var(--accent)");
+            phaseCaption.text("准备开始");
+            roundCaption.text("共 " + sessionConfig.count + " 轮");
+            showOnlyLabel(titleSpan);
             setTime(0);
         }
-    </script>
 
-    <script>
+        function bindPageEvents() {
+            document.addEventListener("visibilitychange", function () {
+                if (document.visibilityState === "visible" && running) {
+                    requestWakeLock();
+                }
+            });
+
+            tipToggleBtn.on("click", function (event) {
+                event.stopPropagation();
+                tipPanel.prop("hidden", !tipPanel.prop("hidden"));
+            });
+
+            tipPanel.on("click", function (event) {
+                event.stopPropagation();
+            });
+
+            $(document).on("click", function () {
+                tipPanel.prop("hidden", true);
+            });
+        }
+
         $(function () {
             initDom();
             initCircle();
             initBtn();
             initConfig();
             initTime();
-            requestWakeLock();
+            bindPageEvents();
         });
     </script>
 </head>
 <body>
-<svg>
-    <circle id="circle" cx="0" cy="0" r="0" style="display: none;"></circle>
-</svg>
-<div id="label">
-    <span id="title" style="display: none;">运动计时器</span>
-    <span id="exercise-message" style="display: none;">
-        <span>第</span>
-        <span id="exercise-index"></span>
-        <span>轮</span>
-        <span id="step-type"></span>
-        <span>: </span>
-        <span id="step-time"></span>
-        <span>秒</span>
-    </span>
-    <span id="finish-message" style="display: none;">｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡</span>
-</div>
-<div id="time"></div>
-<div id="button">
-    <button id="start">开始</button>
-    <button id="pause" style="display: none;">暂停</button>
-    <button id="resume" style="display: none;">继续</button>
-    <button id="stop" style="display: none;">停止</button>
-</div>
+<main class="app">
+    <section class="timer-card">
+        <header class="header">
+            <div class="header-top">
+                <span class="eyebrow">Pulse Timer</span>
+                <div class="tip-wrap">
+                    <button id="tip-toggle" class="tip-toggle" type="button">Tip</button>
+                    <div id="tip-panel" class="tip-panel" hidden>
+                        <strong>使用说明</strong><br/>
+                        通过 URL 参数配置，例如 `?exercise=45&rest=15&count=8`。
+                    </div>
+                </div>
+            </div>
+            <div id="label" aria-live="polite">
+                <p id="title">准备开始</p>
+                <p id="exercise-message">
+                    <span>第</span>
+                    <span id="exercise-index"></span>
+                    <span>轮</span>
+                    <span id="step-type"></span>
+                    <span>·</span>
+                    <span id="step-time"></span>
+                    <span>秒</span>
+                </p>
+                <p id="finish-message">已完成，收操一下</p>
+            </div>
+        </header>
+
+        <div class="summary">
+            <div class="summary-chip">
+                <span>运动时长</span>
+                <strong id="summary-exercise"></strong>
+            </div>
+            <div class="summary-chip">
+                <span>休息时长</span>
+                <strong id="summary-rest"></strong>
+            </div>
+            <div class="summary-chip">
+                <span>轮数</span>
+                <strong id="summary-count"></strong>
+            </div>
+            <div class="summary-chip">
+                <span>总时长</span>
+                <strong id="summary-total"></strong>
+            </div>
+        </div>
+
+        <div class="timer-shell">
+            <svg class="timer-svg" viewBox="0 0 100 100" aria-hidden="true">
+                <circle id="track" cx="50" cy="50" r="44"></circle>
+                <circle id="circle" cx="50" cy="50" r="44"></circle>
+            </svg>
+            <div class="timer-center">
+                <div id="time">00:00.00</div>
+                <div class="timer-meta">
+                    <span class="phase-caption" id="phase-caption">准备开始</span>
+                    <span class="round-caption" id="round-caption">共 2 轮</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="button">
+            <div class="primary-slot">
+                <button id="start" class="primary">开始</button>
+                <button id="pause" class="primary" style="display: none;">暂停</button>
+                <button id="resume" class="primary" style="display: none;">继续</button>
+            </div>
+            <button id="stop" class="secondary" style="display: none;">停止</button>
+        </div>
+    </section>
+</main>
 </body>
 </html>
